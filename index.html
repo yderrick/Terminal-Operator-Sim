@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Harrowmere LPG Terminal</title>
+<meta name="description" content="Run an LPG terminal for a twelve-hour shift: tanker arrivals, gauging, alarms, permit decisions, scored on safety and throughput.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@400;600&family=Saira+Condensed:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="css/hmi.css">
+</head>
+<body>
+<div id="app">
+  <header class="top" id="top"></header>
+  <div class="body">
+    <nav class="nav" id="nav" aria-label="Console pages"></nav>
+    <main class="main" id="main"></main>
+    <aside class="side" id="side" aria-label="Attention queue and radio"></aside>
+  </div>
+  <section class="alarms" id="alarms" aria-label="Alarm summary"></section>
+</div>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<div id="pausebar"></div>
+<div id="lesson"></div>
+<div id="modal"></div>
+<div id="start" class="start"></div>
+<script src="js/core/util.js"></script>
+<script src="js/core/physics.js"></script>
+<script src="js/core/data.js"></script>
+<script src="js/core/content.js"></script>
+<script src="js/core/sim.js"></script>
+<script src="js/core/plant.js"></script>
+<script src="js/core/rack.js"></script>
+<script src="js/core/rail.js"></script>
+<script src="js/core/crew.js"></script>
+<script src="js/core/permits.js"></script>
+<script src="js/core/events.js"></script>
+<script src="js/core/report.js"></script>
+<script src="js/ui/dom.js"></script>
+<script src="js/ui/svg.js"></script>
+<script src="js/ui/views-ops.js"></script>
+<script src="js/ui/views-safety.js"></script>
+<script src="js/ui/app.js"></script>
+</body>
+</html>

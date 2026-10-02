@@ -1,0 +1,11 @@
+{
+  "name": "harrowmere-lpg-terminal",
+  "version": "1.0.0",
+  "description": "Browser game: run an LPG terminal control room for a twelve-hour shift.",
+  "private": true,
+  "scripts": {
+    "build": "node tools/build.js",
+    "test": "node tests/run.js"
+  },
+  "license": "MIT"
+}

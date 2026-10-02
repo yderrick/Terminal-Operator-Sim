@@ -837,6 +837,17 @@
     }
     return { ok: true };
   });
+  A('fwRepair', (S, which) => {
+    const p = S.fw[which];
+    if (!p.failed) return { ok: false, msg: p.tag + ' has not failed.' };
+    if (p.repairing) return { ok: false, msg: 'Repair already under way.' };
+    p.repairing = true;
+    return L.crewMod.dispatch(S, null, {
+      kind: 'repair', label: 'Fault-find ' + p.tag + ' with the fire pump contractor', x: L.data.POINTS.fwPumps.x, y: L.data.POINTS.fwPumps.y, work: 40 * 60,
+      done: (S2, c) => { p.failed = false; p.failLatent = false; p.repairing = false; sim.radio(S2, c.call, p.tag + ': ' + (which === 'diesel' ? 'flat start batteries and a failed charger fuse — replaced, cranks and runs.' : 'starter contactor replaced, pump runs.') + ' Back on auto.'); },
+      cancel: () => { p.repairing = false; },
+    });
+  });
   A('iaStart', (S, id) => {
     const c = S.util.ia.comps.find((x) => x.id === id);
     if (!powerOK(S)) return { ok: false, msg: 'No power.' };

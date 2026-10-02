@@ -272,13 +272,13 @@
             tr.psvLift = true;
             S.stats.incidents++;
             sim.log(S, 'safety', 'Truck ' + tr.plate + ' relief valve lifting' + (tr.liqFrac > 0.985 ? ' — tank liquid-full!' : ' — overpressure.'), 'crit');
-            sim.score(S, 'safety', -20, 'Truck ' + tr.plate + ' relief valve lifted (' + (tr.liqFrac > 0.985 ? 'overfilled to liquid-full' : 'overpressure') + ')', 'A tanker filled beyond its filling ratio has no vapour space left. As the liquid warms it expands until the tank is liquid-full, then pressure rises extremely fast and the relief valve lifts.');
+            sim.score(S, 'safety', -20, 'Truck ' + tr.plate + ' relief valve lifted (' + (tr.liqFrac > 0.985 ? 'overfilled to liquid-full' : 'overpressure') + ')', 'A tanker filled beyond its filling ratio has no vapour space left. As the liquid warms it expands until the tank is liquid-full, then pressure rises extremely fast and the relief valve lifts. At Los Alfaques (1978) an overloaded tanker with no relief valve ruptured beside a campsite.');
             if (tr.pos) L.plant.addLeak(S, { x: tr.pos.x, y: tr.pos.y - 3, zone: tr.state === 'AT_BAY' ? 'LR' : 'GT', src: { kind: 'truckpsv', id: tr.id }, rate: 0.6, product: prod, label: 'Truck ' + tr.plate + ' PSV' });
           } else if (!lift && tr.psvLift && tr.liqFrac < 0.97) tr.psvLift = false;
           sim.setAlarm(S, 'TRUCKPSV-' + tr.id, 'TRUCKPSV', tr.plate, tr.psvLift);
           if (tr.wallT > 560 && tr.P > 4) {
             S.stats.incidents++;
-            sim.score(S, 'safety', -100, 'Road tanker ' + tr.plate + ' BLEVE at the rack', 'Los Alfaques (1978) and many rack fires show that a tanker heated by fire without cooling fails within minutes. Rack deluge exists for this.');
+            sim.score(S, 'safety', -100, 'Road tanker ' + tr.plate + ' BLEVE at the rack', 'A road tanker has a thin shell and a small liquid mass. Engulfed in fire without cooling, the vapour-space shell can fail in minutes. Rack deluge exists for exactly this.');
             sim.endShift(S, 'BLEVE of road tanker ' + tr.plate, 'catastrophe');
             return;
           }
