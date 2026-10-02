@@ -504,7 +504,7 @@
     }
     for (const b of S.bays) {
       const tr = b.truckId && S.trucks.find((x) => x.id === b.truckId);
-      if (tr && !tr.driverEvacuated && U.dist(b.x, b.y, lk.x, lk.y) < 14) {
+      if (tr && !tr.driverEvacuated && tr.state === 'AT_BAY' && (lelAt(S, b.x, b.y + 4) > 50 || U.dist(b.x, b.y, lk.x, lk.y) < 5)) {
         tr.driverEvacuated = true;
         S.stats.injuries = (S.stats.injuries || 0) + 1;
         sim.score(S, 'safety', -30, 'Driver of ' + tr.plate + ' burned in flash fire at ' + b.tag, 'Drivers must leave the bay on a gas alarm. Sound the bay alarm and stop loading at the first detector, not the second.');
@@ -538,9 +538,9 @@
         if (fed) lk.rate = approach(lk.rate, lk.rate0, dt, 60);
         else {
           // Trapped inventory bleeds down.
-          const out = Math.min(lk.residual, lk.rate * dt);
-          lk.residual -= out;
-          lk.rate = lk.residual > 0.5 ? Math.max(0.002, lk.rate * Math.exp(-dt / 25)) : 0;
+          // Trapped inventory bleeds down roughly exponentially.
+          lk.rate = lk.residual > 0.5 ? Math.min(lk.rate, lk.residual / 30) : 0;
+          lk.residual = Math.max(0, lk.residual - lk.rate * dt);
         }
         const kg = lk.rate * dt;
         lk.total += kg;
@@ -552,6 +552,14 @@
           if (tr) { tr.content = Math.max(0, tr.content - kg); if (tr.pos) { lk.x = tr.pos.x; lk.y = tr.pos.y - 3; } }
         }
         else if (lk.src.kind === 'pump') { const tk = S.tanks[S.headers[S.pumps[lk.src.id].product].source]; if (tk) tk.M -= kg; }
+        // A driver standing at the bay smells or hears a leak on the arm.
+        if (lk.src.kind === 'bay' && !lk.reported && S.t - lk.t0 > 240 && lk.rate > 0.01) {
+          const b = S.bays.find((x) => x.id === lk.src.id);
+          if (b && b.truckId) {
+            lk.reported = true; lk.seen = true;
+            sim.log(S, 'rack', b.tag + ': driver reports a hissing sound and strong gas smell at the liquid arm swivel.', 'warn');
+          }
+        }
         // First discovery messages
         if (!lk.seen) {
           const near = S.gd.some((g) => !g.inhibited && g.lel > 10 && U.dist(g.x, g.y, lk.x, lk.y) < 40);
@@ -561,7 +569,7 @@
       // --- Ignition
       for (const lk of S.leaks) {
         if (lk.ignited || lk.rate < 0.005) continue;
-        let p = 0.00003 * Math.sqrt(lk.rate) * S.diff.faultMult;
+        let p = 0.00001 * Math.sqrt(lk.rate) * S.diff.faultMult;
         for (const src of ignitionSources(S)) {
           const c = lelAt(S, src.x, src.y);
           if (c > 55) p += 0.012 * (src.strength || 1);

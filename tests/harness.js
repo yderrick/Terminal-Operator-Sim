@@ -55,7 +55,7 @@ function goodBot(L, S, style) {
   if (S.fw.elec.running && !S.fires.length && !Object.values(S.fw.deluge).some((d) => d.open)) act('fwPump', 'elec', false);
   for (const k of ['in', 'out']) if (S.wb[k].zero && !S.wb[k].busy) act('wbZero', k);
   for (const t of S.tasks) if (t.id.startsWith('rounds') && t.status === 'pending' && S.t >= t.startT && !t.botSent) { t.botSent = true; act('crewRounds'); }
-  S.findings.forEach((f, i) => { if (f.status === 'open' && !f.botTried) { if (f.kind === 'seal' || f.kind === 'bearing') { const p = S.pumps[f.id]; if (p.running) { const o = Object.values(S.pumps).find((q) => q.product === p.product && q.id !== p.id && !q.loto); if (o) { act('pumpDuty', o.id); act('pumpStop', p.id); } else return; } } if (f.kind === 'flange') act('setTankValve', f.id, 'out', false); f.botTried = true; act('fixFinding', i); } });
+  S.findings.forEach((f, i) => { if (f.kind === 'leak' && f.status === 'open') { const lk = S.leaks.find((x) => x.id === f.leakId); if (lk && lk.src.kind === 'manifold') act('setTankValve', lk.src.id, 'out', false); if (lk && lk.src.kind === 'pump') act('pumpIsolate', lk.src.id, true); } if (f.status === 'open' && !f.botTried) { if (f.kind === 'seal' || f.kind === 'bearing') { const p = S.pumps[f.id]; if (p.running) { const o = Object.values(S.pumps).find((q) => q.product === p.product && q.id !== p.id && !q.loto); if (o) { act('pumpDuty', o.id); act('pumpStop', p.id); } else return; } } if (f.kind === 'flange') act('setTankValve', f.id, 'out', false); f.botTried = true; act('fixFinding', i); } });
   // Gauging
   const og = S.gauge.opening;
   const doGauge = (which) => {
@@ -74,7 +74,7 @@ function goodBot(L, S, style) {
     const H = S.headers[prod];
     const src = S.tanks[H.source];
     const alts = S.tankOrder.map((id) => S.tanks[id]).filter((t) => t.product === prod && t.id !== H.source && !t.offspec);
-    if (src.fillMeas < 0.15 && alts.length) { const best = alts.sort((a, b) => b.fill - a.fill)[0]; if (best.fill > src.fill + 0.1) act('setHeaderSource', prod, best.id); }
+    if ((src.fillMeas < 0.15 || !src.xvOut) && alts.length) { const best = alts.sort((a, b) => b.fill - a.fill)[0]; if (best.fill > src.fill + 0.1 || !src.xvOut) act('setHeaderSource', prod, best.id); }
   }
   // Gate
   for (const tr of S.trucks.filter((t) => t.state === 'QUEUE')) {
@@ -96,7 +96,7 @@ function goodBot(L, S, style) {
   for (const b of S.bays) {
     const tr = b.truckId && S.trucks.find((x) => x.id === b.truckId);
     if (b.hold) act('bayResolve', b.id, b.hold.options[0][0]);
-    if (b.state === 'READY' && !hold && !S.simopsHold.LR) {
+    if (b.state === 'READY' && !hold && !S.simopsHold.LR && !(b.product === 'propane' && S.util.odor.failed)) {
       const mx = L.rack.maxNet(S, tr);
       const want = tr.order === 'FULL' ? mx.max : Math.min(tr.order, mx.max);
       act('bayAuthorize', b.id, style.reckless ? Math.floor(tr.capL * mx.fr * 1.12) : Math.floor(want - 80));
@@ -106,8 +106,12 @@ function goodBot(L, S, style) {
       if (tr.engineOn) act('bayPA', b.id);
       if (b.ground !== 'ok') act('bayReground', b.id);
       if (b.damaged) act('bayFinish', b.id);
-      else if (!hold && !(b.product === 'propane' && S.util.odor.failed) && !S.leaks.length && !L.plant.esdActive(S, 'LR')) act('bayResume', b.id);
+      else if (!hold && !(b.product === 'propane' && S.util.odor.failed) && !S.gd.some((g) => g.zone === 'LR' && g.lel > 10) && !L.plant.esdActive(S, 'LR') && !S.leaks.some((l) => l.src.kind === 'bay' && l.src.id === b.id && l.reported)) act('bayResume', b.id);
     }
+    const armLeak = S.leaks.find((l) => l.src.kind === 'bay' && l.src.id === b.id && l.reported);
+    if (armLeak && b.state === 'LOADING') act('bayStop', b.id);
+    if (armLeak && b.state === 'STOPPED') act('bayFinish', b.id);
+    if (armLeak && b.state === 'IDLE' && !b.suspended) act('baySuspend', b.id, true);
     if (b.damaged && b.state === 'IDLE') act('bayRepair', b.id);
     if (b.suspended && b.repairUntil && S.t > b.repairUntil) act('baySuspend', b.id, false);
   }
@@ -164,7 +168,7 @@ function goodBot(L, S, style) {
       if ((pm.ignition || pm.type === 'vehicle') && as.simops.length) { act('permitDecide', pm.no, 'reject', { reason: 'simops' }); continue; }
       act('permitDecide', pm.no, 'approve', { conditions: conds.filter((c) => c !== 'suspendLR' || as.simops.length) });
     }
-    if (pm.status === 'workdone') act('permitClose', pm.no);
+    if (pm.status === 'workdone' || (pm.status === 'suspended' && !S.leaks.length && !S.fires.length)) act('permitClose', pm.no);
   }
 }
 

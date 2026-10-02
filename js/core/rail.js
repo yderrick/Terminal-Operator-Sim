@@ -7,19 +7,23 @@
 
   function carDerived(c) {
     const Pabs0 = P.psat(c.wP, c.T);
-    const rl = P.rhoL(c.wP, c.T), rv0 = P.rhoV(c.wP, c.T, Pabs0);
-    const liquidVolIfSat = (c.M - rv0 * c.V) / (rl - rv0);
-    if (liquidVolIfSat > 0.02) {
+    const rl = P.rhoL(c.wP, c.T);
+    const rvNow = P.rhoV(c.wP, c.T, Pabs0 + c.dP);
+    const liquidVol = (c.M - rvNow * c.V) / (rl - rvNow);
+    if (liquidVol > 0.02) {
       const part = P.partition(c.M, c.V, c.wP, c.T, Pabs0 + c.dP);
       c.ml = part.ml; c.mv = part.mv; c.Vl = part.Vl;
       c.Psat = Pabs0;
+      c.Pabs = Pabs0 + c.dP;
     } else {
-      // No liquid left: superheated vapour, ideal gas with crude Z.
-      c.ml = 0; c.mv = c.M; c.Vl = 0;
+      // No liquid left: the car holds vapour only, pressure from the gas law.
       const mw = 44.1 * c.wP + 58.1 * (1 - c.wP);
-      c.Psat = Math.min(Pabs0, (c.M / c.V) * 8.314 * (c.T + 273.15) / mw / 100 / 0.93);
+      const Pgas = (c.M / c.V) * 8.314 * (c.T + 273.15) / mw / 100 / Math.max(0.75, 1 - 0.012 * (Pabs0 + c.dP));
+      c.ml = 0; c.mv = c.M; c.Vl = 0;
+      c.Pabs = Math.min(Pgas, Pabs0 + c.dP);
+      c.Psat = Math.min(Pabs0, c.Pabs);
+      c.dP = Math.max(0, c.Pabs - Pabs0);
     }
-    c.Pabs = c.Psat + c.dP;
     c.P = c.Pabs - ATM;
     c.fill = c.Vl / c.V;
   }
@@ -73,7 +77,7 @@
           sim.setAlarm(S, 'DEMUR-' + c.id, 'DEMUR', c.number, c.state !== 'RELEASED' && S.t > c.freeUntil);
         }
         c.T = approach(c.T, S.weather.Tamb + 3 * S.weather.solar, dt, 5 * 3600);
-        if (!(comp.running && comp.lineup === c.id && comp.mode === 'LIQUID')) c.dP = approach(c.dP, 0, dt, 900);
+        if (!(comp.running && comp.lineup === c.id && comp.mode === 'LIQUID') && c.ml > 0) c.dP = approach(c.dP, 0, dt, 900);
         carDerived(c);
       }
       // Compressor

@@ -210,7 +210,7 @@
       }
       case 'armLeak': {
         const b = loadingBay(S); if (!b) return retry();
-        L.plant.addLeak(S, { x: b.x + 2, y: b.y - 6, zone: 'LR', src: { kind: 'bay', id: b.id }, rate: r.range(0.05, 0.16), product: b.product, label: b.tag + ' liquid arm swivel joint', residual: 25 });
+        L.plant.addLeak(S, { x: b.x + 2, y: b.y - 3, zone: 'LR', src: { kind: 'bay', id: b.id }, rate: r.range(0.07, 0.2), product: b.product, label: b.tag + ' liquid arm swivel joint', residual: 25 });
         break;
       }
       case 'iaTrip': {
@@ -274,6 +274,13 @@
       const tk = S.tanks[id];
       if (tk.radar.fault && !tk.radar.flagged && !tk.radar.reported && S.rng.chance(0.5)) { tk.radar.reported = true; out.push({ kind: 'radar', id, text: tk.tag + ': local magnetic gauge reads ' + Math.round(tk.level) + ' mm but the DCS shows ' + Math.round(tk.levelMeas) + ' mm.' }); }
     }
+    for (const lk of S.leaks) {
+      if (lk.rate > 0.005 && !lk.found && !lk.ignited) {
+        lk.found = true; lk.seen = true;
+        const how = { bay: 'stop the bay to isolate it', pump: 'stop and isolate the pump', manifold: 'close the sphere outlet ROSOV', rail: 'close the car valves', field: 'send me back to shut the manual block valve', tankpsv: 'stop the receipt', truckpsv: 'cool the truck' }[lk.src.kind] || 'isolate it';
+        out.push({ kind: 'leak', leakId: lk.id, text: 'LEAK at ' + lk.label + ' — hissing, frost on the fitting, ' + Math.round(L.plant.lelAt(S, lk.x + 1, lk.y + 1)) + '% LEL right beside it. Recommend we ' + how + '.' });
+      }
+    }
     if (S.fw.diesel.failLatent && !S.fw.diesel.reported && S.rng.chance(0.3)) { S.fw.diesel.reported = true; out.push({ kind: 'diesel', text: 'P-502 diesel fire pump: battery charger showing a fault light. Might not crank.' }); }
     return out;
   }
@@ -334,6 +341,12 @@
       sim.log(S, 'permit', pm.no + ' raised by maintenance planner for ' + p.tag + '. Pump locked out. Close the permit when the work is complete to return it to service.');
       sim.score(S, 'safety', +2, f.kind === 'seal' ? 'Weeping seal on ' + p.tag + ' taken out of service before failure' : 'Worn bearing on ' + p.tag + ' taken out of service before a trip');
       return { ok: true, msg: p.tag + ' handed to maintenance.' };
+    }
+    if (f.kind === 'leak') {
+      const lk = S.leaks.find((x) => x.id === f.leakId);
+      if (!lk) { f.status = 'closed'; return { ok: true, msg: 'That release has already stopped.' }; }
+      if (lk.src.kind === 'field') { f.status = 'closed'; return sim.actions.crewIsolateField(S, lk.id); }
+      return { ok: false, msg: 'Isolate it from the control room: ' + (lk.src.kind === 'manifold' ? 'close the ' + S.tanks[lk.src.id].tag + ' outlet ROSOV.' : lk.src.kind === 'pump' ? 'stop and isolate ' + S.pumps[lk.src.id].tag + '.' : lk.src.kind === 'bay' ? 'stop the bay.' : 'stop the transfer.') };
     }
     if (f.kind === 'radar') { f.status = 'closed'; return sim.actions.gaugeFlag(S, 'opening', f.id, true, true); }
     if (f.kind === 'diesel') {

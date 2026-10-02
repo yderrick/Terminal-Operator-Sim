@@ -450,6 +450,8 @@
       default: break;
     }
     if (tr) sim.setAlarm(S, 'ENGINE-' + b.id, 'ENGINE', b.tag, !!tr.engineOn && ['LOADING', 'STOPPED', 'READY'].includes(b.state));
+    sim.setAlarm(S, 'NOFLOW-' + b.id, 'NOFLOW', b.tag, b.state === 'LOADING' && (b.noFlowT || 0) > 120);
+    if (b.state !== 'LOADING') b.noFlowT = 0;
     sim.setAlarm(S, 'GND-' + b.id, 'GND', b.tag, b.state === 'STOPPED' && b.stopReason === 'ground permissive lost');
     sim.setAlarm(S, 'BAYESD-' + b.id, 'BAYESD', b.tag, b.state === 'STOPPED' && /e-stop/.test(b.stopReason));
     // Lightning: loading during a lightning hold
