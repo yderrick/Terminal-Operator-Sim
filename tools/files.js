@@ -5,6 +5,6 @@ module.exports = {
     'js/core/rack.js', 'js/core/rail.js', 'js/core/crew.js', 'js/core/permits.js', 'js/core/events.js', 'js/core/report.js', 'js/core/autopilot.js',
   ],
   world: ['js/world/kit.js', 'js/world/site.js', 'js/world/camera.js', 'js/world/actors.js', 'js/world/world.js'],
-  ui: ['js/ui/dom.js', 'js/ui/svg.js', 'js/ui/views-ops.js', 'js/ui/views-safety.js', 'js/ui/hud.js', 'js/ui/app.js'],
+  ui: ['js/ui/dom.js', 'js/ui/svg.js', 'js/ui/views-ops.js', 'js/ui/views-safety.js', 'js/ui/hud.js', 'js/ui/tutor.js', 'js/ui/app.js'],
   css: ['css/hmi.css'],
 };

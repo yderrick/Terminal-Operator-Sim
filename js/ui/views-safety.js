@@ -147,8 +147,21 @@
   const LOCS = [
     ['Tank farm manifolds', 70, 56], ['Pump area', 78, 79], ['Loading rack', 213, 90], ['Rail siding', 66, 132], ['Compressor C-301', 66, 128], ['Odorant skid', 176, 68], ['Fire pumps', 34, 120],
   ];
+  const AUTO = {
+    off: 'You give every order. Field operators wait for you, apart from emergencies they can see.',
+    field: 'Field operators do rounds, gauging, rail connections, gas tests and isolations without being asked. Control-room decisions stay with you.',
+    full: 'Field operators and a CCR assistant run routine work. They bring key decisions (gate, presets, release, rail specs, permits) to you as approvals.',
+    watch: 'An experienced crew runs everything and explains each decision. Take over from the guided-shift card.',
+  };
   V.crew = simple((S) => {
-    let h = '<div class="sec-h"><h2>Field crew & routine</h2><span class="sub">Two field operators · radio log in the side panel</span></div><div class="grid g2">';
+    const n = S.crew.length, a = S.cfg.autonomy, ap = S.cfg.approvals;
+    let h = '<div class="sec-h"><h2>Field crew & routine</h2><span class="sub">' + (n === 1 ? 'One field operator' : n + ' field operators') + ' · radio log in the side panel</span></div>';
+    // How much the crew do without being told.
+    const lvl = (v, lbl) => btn(lbl, 'setAutonomy', [v], 'sm' + (a === v ? '' : ' quiet'), { title: AUTO[v] });
+    h += '<div class="card autoctl"><div class="row sp"><h3>Crew autonomy</h3>' + (S.approvals.length ? pill(S.approvals.length + ' waiting for approval', 'p4') : '') + '</div>';
+    h += '<div class="row">' + lvl('off', 'None') + lvl('field', 'Field work') + lvl('full', 'Full') + (a === 'watch' ? pill('Demonstration crew', 'p4') : '') + '</div><p class="small muted">' + e(AUTO[a] || '') + '</p>';
+    if (a === 'full') h += '<div class="row"><span class="small">Key decisions:</span>' + [['wait', 'Wait for me'], ['timeout', 'Crew act after 10 min'], ['auto', 'Crew decide']].map(([v, lbl]) => btn(lbl, 'setAutonomy', ['full', v], 'sm' + (ap === v ? '' : ' quiet'))).join('') + '</div>';
+    h += '</div><div class="grid g2" style="margin-top:12px">';
     for (const c of S.crew) {
       h += '<div class="card' + (c.injured ? ' crit' : '') + '"><div class="row sp"><h3>' + e(c.name) + ' <span class="tag">' + c.call + '</span></h3>' + (c.injured ? pill('Injured', 'p1') : c.task ? pill(c.state === 'walk' ? 'Walking' : c.state === 'retreat' ? 'Backing out' : 'Working', 'run') : pill('Available', 'ok')) + '</div>';
       h += '<dl class="kv"><dt>Task</dt><dd>' + (c.task ? e(c.task.label) : '—') + '</dd><dt>Queue</dt><dd>' + (c.queue.length ? c.queue.map((t) => e(t.label)).join('<br>') : 'empty') + '</dd><dt>Personal monitor</dt><dd' + ((c.lel || 0) >= 10 ? ' class="flag"' : '') + '>' + Math.round(c.lel || 0) + '% LEL</dd></dl>';

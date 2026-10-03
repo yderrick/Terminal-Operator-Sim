@@ -245,9 +245,9 @@ svg.plant .esdmask { fill: var(--p1); opacity: .06; }
 /* ---------- Side column ---------- */
 .side h3 { font-size: 15px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); }
 .att { display: grid; gap: 6px; }
-.att button { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r); padding: 6px 8px; font-size: 13px; }
-.att button:hover { border-color: var(--accent); }
-.att button:focus-visible { outline: 2px solid var(--accent); }
+.att > button { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r); padding: 6px 8px; font-size: 13px; }
+.att > button:hover { border-color: var(--accent); }
+.att > button:focus-visible { outline: 2px solid var(--accent); }
 .att i { width: 10px; height: 10px; border-radius: 50%; background: var(--ink-3); }
 .att i.p1 { background: var(--p1); } .att i.p2 { background: var(--p2); } .att i.p3 { background: var(--p3); } .att i.p4 { background: var(--p4); }
 .att small { color: var(--ink-3); font-family: var(--f-data); }
@@ -424,6 +424,82 @@ body.no-world .viewbar, body.no-world .minimap { display: none; }
 .top { gap: 10px 14px; }
 @media (max-width: 1360px) { .speed button { padding: 3px 5px; } .score { min-width: 64px; } .wx .hide-s { display: none; } }
 
+/* ---------- Settings screen ---------- */
+.watch { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; align-items: center; background: var(--accent); color: var(--accent-ink); border-radius: 6px; padding: 16px 20px; max-width: 720px; box-shadow: 0 10px 30px rgba(0,0,0,.22); }
+.watch:hover { filter: brightness(1.08); }
+.watch:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+.watch-play { width: 64px; height: 64px; border-radius: 50%; background: var(--accent-ink); color: var(--accent); display: grid; place-items: center; font-size: 26px; padding-left: 4px; box-sizing: border-box; }
+.watch b { display: block; font-family: var(--f-display); font-size: 24px; letter-spacing: .02em; margin-bottom: 2px; }
+.watch span span { font-size: 14px; opacity: .92; }
+.set-h { font-size: 20px; margin: 4px 0 -8px; }
+#settings { display: grid; gap: 10px; max-width: 720px; }
+.presets { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 6px; }
+.preset { all: unset; box-sizing: border-box; cursor: pointer; background: var(--glass); backdrop-filter: blur(6px); border: 1px solid var(--line); border-radius: var(--r); padding: 8px 10px; display: grid; gap: 2px; align-content: start; }
+.preset:hover { border-color: var(--accent); }
+.preset.on { border-color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+.preset:focus-visible { outline: 2px solid var(--accent); }
+.preset b { font-family: var(--f-display); font-size: 17px; }
+.preset span { font-size: 12px; color: var(--ink-2); line-height: 1.3; }
+.setgrid { display: grid; gap: 0; background: var(--glass); backdrop-filter: blur(6px); border: 1px solid var(--line); border-radius: var(--r); }
+.setrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; align-items: center; padding: 8px 12px; border-top: 1px solid var(--line); }
+.setrow:first-child { border-top: 0; }
+.setrow > div:first-child b { display: block; font-size: 14px; }
+.setrow > div:first-child span { display: block; font-size: 12.5px; color: var(--ink-3); }
+.setrow input[type=range] { width: 200px; accent-color: var(--accent); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; flex-wrap: wrap; }
+.seg button { border: 0; border-left: 1px solid var(--line); background: var(--panel-2); color: var(--ink); padding: 5px 10px; font-size: 13px; cursor: pointer; }
+.seg button:first-child { border-left: 0; }
+.seg button.on { background: var(--accent); color: var(--accent-ink); }
+.seg button[disabled] { opacity: .45; cursor: not-allowed; }
+.stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.stepper button { border: 0; background: var(--panel-2); color: var(--ink); width: 34px; height: 30px; font-size: 18px; cursor: pointer; }
+.stepper button:hover { background: var(--accent); color: var(--accent-ink); }
+.stepper output { min-width: 34px; text-align: center; font-family: var(--f-data); font-size: 16px; }
+.go-row { align-items: center; gap: 10px; flex-wrap: wrap; }
+.diffbadge { font-size: 14px; margin-right: auto; }
+.diffbadge b { font-family: var(--f-display); font-size: 17px; }
+.btn.big { padding: 9px 22px; font-size: 16px; font-family: var(--f-display); letter-spacing: .04em; }
+
+/* ---------- Crew approvals ---------- */
+.appr { background: var(--panel-2); border: 1px solid var(--p4); box-shadow: inset 3px 0 0 var(--p4); border-radius: var(--r); padding: 7px 9px; display: grid; gap: 4px; font-size: 13px; }
+.appr-h { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.appr p { margin: 0; color: var(--ink-2); font-size: 12.5px; }
+.appr .row { gap: 4px; flex-wrap: wrap; }
+.autoctl { display: grid; gap: 8px; }
+
+/* ---------- Guided shift ---------- */
+.tutor { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(var(--alarm-h) + 14px); width: min(600px, calc(100% - 32px)); z-index: 46; }
+.tut-in { background: var(--panel); border: 1px solid var(--accent); border-top: 4px solid var(--accent); border-radius: 4px; padding: 12px 14px; box-shadow: 0 14px 40px rgba(0,0,0,.32); display: grid; gap: 6px; max-height: calc(100vh - var(--top-h) - var(--alarm-h) - 40px); overflow-y: auto; }
+.tut-eyebrow { font-family: var(--f-display); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); display: flex; gap: 6px; align-items: center; }
+.tut-in h3 { font-size: 20px; line-height: 1.15; }
+.tut-in p { margin: 0; font-size: 14.5px; line-height: 1.45; }
+.tut-idle { color: var(--ink-3); }
+.tut-bar { height: 3px; background: var(--line); }
+.tut-bar i { display: block; height: 100%; background: var(--accent); }
+.tut-tick { font-size: 12.5px; color: var(--ink-2); border-top: 1px solid var(--line); padding-top: 6px; display: grid; gap: 2px; }
+.tut-tick b { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.tut-tick span { font-family: var(--f-data); color: var(--ink-3); }
+.tut-btns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 2px; }
+.tut-btns label.chk { font-size: 12.5px; align-items: center; }
+.tut-sp { flex: 1; }
+body.tutorial .lesson, body.tutorial #pausebar { display: none; }
+body.tutorial .minimap { display: none; }
+body.tutorial .inspector { bottom: auto; top: calc(var(--top-h) + 10px); max-height: calc(100% - var(--top-h) - var(--alarm-h) - 260px); overflow-y: auto; }
+@media (max-width: 1180px) { .tutor { left: 16px; transform: none; width: min(560px, calc(100% - 32px)); } }
+@media (max-width: 760px) {
+  .tutor { left: 10px; right: 10px; width: auto; bottom: calc(var(--alarm-h) + 8px); }
+  .tut-in { max-height: 46vh; padding: 10px 12px; }
+  .tut-in h3 { font-size: 17px; }
+  .tut-in p { font-size: 13.5px; }
+  body.tutorial .viewbar { display: none; }
+  body.tutorial .inspector { display: none; }
+  .setrow { grid-template-columns: 1fr; }
+  .setrow input[type=range] { width: 100%; }
+  .watch { grid-template-columns: 44px minmax(0, 1fr); padding: 12px 14px; gap: 12px; }
+  .watch-play { width: 44px; height: 44px; font-size: 18px; }
+  .watch b { font-size: 20px; }
+}
+
 </style>
 </head>
 <body>
@@ -444,6 +520,7 @@ body.no-world .viewbar, body.no-world .minimap { display: none; }
 <div id="tip" class="tip" hidden></div>
 <div id="ctx" class="ctx" hidden></div>
 <div id="toasts" class="toasts" aria-live="polite"></div>
+<div id="tutor" class="tutor" hidden></div>
 <div id="pausebar"></div>
 <div id="lesson"></div>
 <div id="modal"></div>
@@ -809,7 +886,7 @@ body.no-world .viewbar, body.no-world .minimap { display: none; }
     hauliers: ['Northgate Haulage', 'Brenmar Gas Logistics', 'Coastline Tankers', 'Ridgeway Fuels Transport', 'Fenwick & Daughters', 'Tarn Valley Bulk', 'Orrin Road Freight'],
     customers: ['Westmoor Gas Supplies', 'Calder Heating Co-op', 'Brightwater Autogas', 'Penhallow Farm Fuels', 'Ashby Industrial Gases', 'Lowfield Catering Gas', 'Kestrel Energy Retail', 'Dunmore Rural Energy'],
     contractors: ['Stanmore Mechanical', 'Eastfield Electrical', 'Kinross Scaffolding', 'Holt Civil Works', 'Arden Inspection Services', 'Vale Instrument Services', 'Corran Painting & Coatings'],
-    crew: [{ id: 'FO1', name: 'Mira Achebe', call: 'Field 1' }, { id: 'FO2', name: 'Tomas Reilly', call: 'Field 2' }],
+    crew: [{ id: 'FO1', name: 'Mira Achebe', call: 'Field 1' }, { id: 'FO2', name: 'Tomas Reilly', call: 'Field 2' }, { id: 'FO3', name: 'Noor Haddad', call: 'Field 3' }, { id: 'FO4', name: 'Ilse Varga', call: 'Field 4' }, { id: 'FO5', name: 'Kofi Mensah', call: 'Field 5' }, { id: 'FO6', name: 'Rhian Doyle', call: 'Field 6' }],
   };
 
   const DIFFICULTY = {
@@ -818,7 +895,25 @@ body.no-world .viewbar, body.no-world .minimap { display: none; }
     senior: { label: 'Senior operator', trucks: 23, unbooked: 3, randomEvents: 8, latent: 3, permits: 7, storm: 0.65, defectRate: 0.3, hints: false, autoPause: false, targetFrac: 0.97, faultMult: 1.5 },
   };
 
-  L.data = { SITE, ZONES, TANKS, BULLET, PUMPS, BAYS, POINTS, GAS_DET, FLAME_DET, DELUGE, ALARMS, PEOPLE, DIFFICULTY };
+  /* Shift presets for the settings screen. Every field can be changed individually.
+     autonomy: 'off' (you give every order), 'field' (crew do field work on their own),
+               'full' (crew and the CCR assistant run routine work and bring key decisions to you), 'watch' (tutorial: they do everything).
+     approvals: 'wait' (key decisions wait for you), 'timeout' (crew act on their recommendation after 10 min), 'auto'. */
+  const PRESETS = {
+    tutorial: { label: 'Guided shift', base: 'trainee', crew: 3, autonomy: 'watch', approvals: 'auto', weather: 'changeable', trucks: 13, rail: 2, faults: 'normal', permits: 4, hints: true, autoPause: false },
+    easy: { label: 'Easy', base: 'trainee', crew: 4, autonomy: 'full', approvals: 'timeout', weather: 'calm', trucks: 12, rail: 1, faults: 'few', permits: 3, hints: true, autoPause: true },
+    normal: { label: 'Normal', base: 'operator', crew: 3, autonomy: 'field', approvals: 'wait', weather: 'changeable', trucks: 17, rail: 2, faults: 'normal', permits: 5, hints: true, autoPause: true },
+    hard: { label: 'Hard', base: 'senior', crew: 2, autonomy: 'off', approvals: 'wait', weather: 'changeable', trucks: 21, rail: 2, faults: 'many', permits: 7, hints: false, autoPause: false },
+    expert: { label: 'Expert', base: 'senior', crew: 1, autonomy: 'off', approvals: 'wait', weather: 'stormy', trucks: 25, rail: 2, faults: 'many', permits: 9, hints: false, autoPause: false },
+  };
+  const FAULTS = {
+    few: { randomEvents: 2, latent: 1, defectRate: 0.14, faultMult: 0.6 },
+    normal: { randomEvents: 5, latent: 2, defectRate: 0.24, faultMult: 1 },
+    many: { randomEvents: 8, latent: 3, defectRate: 0.32, faultMult: 1.5 },
+  };
+  const WEATHER = { calm: 0, changeable: 0.45, stormy: 0.95 };
+
+  L.data = { PRESETS, FAULTS, WEATHER, SITE, ZONES, TANKS, BULLET, PUMPS, BAYS, POINTS, GAS_DET, FLAME_DET, DELUGE, ALARMS, PEOPLE, DIFFICULTY };
 })(globalThis.LPG = globalThis.LPG || {});
 
 // ---- js/core/content.js
@@ -1034,12 +1129,20 @@ ${vpTable()}
   function create(opts) {
     opts = opts || {};
     const seed = (opts.seed >>> 0) || (Math.floor(Math.random() * 1e9) >>> 0);
-    const diffKey = opts.difficulty || 'operator';
+    // A config (from the settings screen) overrides the base difficulty field by field.
+    const cfg = opts.config ? Object.assign({}, L.data.PRESETS.normal, opts.config) : null;
+    const diffKey = cfg ? (cfg.base || 'operator') : (opts.difficulty || 'operator');
+    const base = L.data.DIFFICULTY[diffKey];
+    const diff = cfg ? Object.assign({}, base, L.data.FAULTS[cfg.faults] || {}, {
+      label: cfg.label || base.label, trucks: cfg.trucks, permits: cfg.permits, storm: L.data.WEATHER[cfg.weather] !== undefined ? L.data.WEATHER[cfg.weather] : base.storm,
+      hints: cfg.hints, autoPause: cfg.autoPause, unbooked: Math.max(0, Math.round(cfg.trucks / 9)),
+    }) : base;
     const today = opts.date ? new Date(opts.date) : new Date();
     today.setHours(0, 0, 0, 0);
     const S = {
       version: 1,
-      seed, rng: U.makeRng(seed), difficulty: diffKey, diff: L.data.DIFFICULTY[diffKey],
+      seed, rng: U.makeRng(seed), difficulty: cfg ? (opts.preset || 'custom') : diffKey, diff,
+      cfg: Object.assign({ crew: 2, autonomy: 'off', approvals: 'wait', rail: 2, weather: null }, cfg || {}),
       date: today.getTime(),
       startHour: opts.startHour === undefined ? 6 : opts.startHour,
       shiftLen: 12 * 3600, t: 0, over: false, endReason: null, outcome: null,
@@ -1049,7 +1152,8 @@ ${vpTable()}
       stats: { dispatched: 0, received: 0, trucksOut: 0, trucksRejected: 0, rejectedValid: 0, turnaround: [], vented: 0, alarmsRaised: 0, ackTimes: [], unackCritSec: 0, complaints: 0, demurrageH: 0, nearMisses: 0, incidents: 0, overfills: 0, lpgDispatchedByProduct: { propane: 0, butane: 0 } },
       hornActive: false, hornPri: 4,
       flags: {},
-      settings: { autoPause: !!L.data.DIFFICULTY[diffKey].autoPause, hints: !!L.data.DIFFICULTY[diffKey].hints },
+      settings: { autoPause: !!diff.autoPause, hints: !!diff.hints },
+      approvals: [], approvalSeq: 0, narration: [], narrSeq: 0, touch: {},
     };
     for (const sys of systems) if (sys.init) sys.init(S);
     log(S, 'system', 'Shift started — ' + L.data.SITE.name + ', ' + S.diff.label + ' difficulty, seed ' + seed + '.');
@@ -1088,6 +1192,8 @@ ${vpTable()}
     if (!fn) return { ok: false, msg: 'Unknown action ' + name };
     if (S.over) return { ok: false, msg: 'The shift has ended.' };
     const args = Array.prototype.slice.call(arguments, 2);
+    // Remember what the player did by hand so the crew does not immediately undo it.
+    if (!S._ap && S.touch) S.touch[name + ':' + JSON.stringify(args[0])] = S.t;
     let res;
     try { res = fn.apply(null, [S].concat(args)) || { ok: true }; } catch (e) {
       if (L.sim.strict) throw e;
@@ -2914,7 +3020,7 @@ ${vpTable()}
         cars: [], spots: { R1: null, R2: null },
         comp: { tag: 'C-301', running: false, mode: 'LIQUID', lineup: null, tank: 'V102', dischT: 25, dischP: 0, suctP: 0, ko: 0, tripped: false, tripCause: '', ratio: 1 },
       };
-      const arrivals = [r.range(1.2, 2.0) * 3600, r.range(6.4, 7.6) * 3600];
+      const arrivals = [r.range(1.2, 2.0) * 3600, r.range(6.4, 7.6) * 3600].slice(0, S.cfg.rail === undefined ? 2 : S.cfg.rail);
       let n = 0;
       arrivals.forEach((at, pi) => {
         const count = pi === 0 ? 2 : r.chance(0.6) ? 2 : 1;
@@ -3226,7 +3332,8 @@ ${vpTable()}
     name: 'crew', order: 50,
     init(S) {
       const cr = D.POINTS.control;
-      S.crew = D.PEOPLE.crew.map((c, i) => ({ id: c.id, name: c.name, call: c.call, x: cr.x - 3 + i * 6, y: cr.y - 4, state: 'idle', task: null, queue: [], injured: false, exposure: 0, backedOut: 0 }));
+      const n = U.clamp(S.cfg.crew || 2, 1, D.PEOPLE.crew.length);
+      S.crew = D.PEOPLE.crew.slice(0, n).map((c, i) => ({ id: c.id, idx: i, name: c.name, call: c.call, x: cr.x - 6 + i * 3, y: cr.y - 4, state: 'idle', task: null, queue: [], injured: false, exposure: 0, backedOut: 0 }));
     },
     tick(S, dt) {
       for (const c of S.crew) {
@@ -3274,7 +3381,7 @@ ${vpTable()}
             const t = c.queue.shift();
             if (L.plant.lelAt(S, t.x, t.y) < 20) start(S, c, t); else c.queue.unshift(t);
           } else if (!c.task && !c.stay && U.dist(c.x, c.y, D.POINTS.control.x, D.POINTS.control.y) > 8 && !S.muster.active) {
-            c.state = 'walk'; c.target = { x: D.POINTS.control.x + (c.id === 'FO1' ? -3 : 3), y: D.POINTS.control.y - 4 };
+            c.state = 'walk'; c.target = { x: D.POINTS.control.x - 6 + c.idx * 3, y: D.POINTS.control.y - 4 };
             c.task = { kind: 'return', label: 'Returning to control room', x: c.target.x, y: c.target.y, work: 0 };
           }
           if (c.task && c.task.kind === 'return' && c.state === 'idle') c.task = null;
@@ -3346,7 +3453,7 @@ ${vpTable()}
       if (c.injured) continue;
       if (c.task && !['muster', 'return', 'retreat', 'firewatch'].includes(c.task.kind)) c.queue.unshift(c.task);
       c.task = { kind: 'muster', label: 'Muster point', x: D.POINTS.muster.x, y: D.POINTS.muster.y, work: 0 };
-      c.state = 'walk'; c.target = { x: D.POINTS.muster.x + (c.id === 'FO1' ? -2 : 2), y: D.POINTS.muster.y };
+      c.state = 'walk'; c.target = { x: D.POINTS.muster.x - 5 + c.idx * 2, y: D.POINTS.muster.y };
     }
   }
   function injure(S, c, why) {
@@ -3838,7 +3945,7 @@ ${vpTable()}
     }
   }
 
-  L.permits = { TYPES, CONDITIONS, REJECT_REASONS, TEMPLATES, makePermit, assess };
+  L.permits = { TYPES, CONDITIONS, REJECT_REASONS, TEMPLATES, makePermit, assess, lessonFor };
 })(globalThis.LPG = globalThis.LPG || {});
 
 // ---- js/core/events.js
@@ -3961,7 +4068,8 @@ ${vpTable()}
       const st = (id) => S.tanks[id];
       hv.unshift({ k: 'stock', text: 'Night shift stock at 05:45 (radar): V-101 ' + (st('V101').fillMeas * 100).toFixed(1) + '%, V-102 ' + (st('V102').fillMeas * 100).toFixed(1) + '%, V-103 ' + (st('V103').fillMeas * 100).toFixed(1) + '%. Propane header on V-101, butane on V-103.' });
       const railFirst = S.rail.cars.filter((c) => c.arrivalT < 4 * 3600).length;
-      hv.push({ k: 'rail', text: railFirst + ' propane rail cars due from Saltfleet Refinery around ' + U.clock(S, S.rail.cars[0].arrivalT) + ', more after lunch. C-301 lined up to V-102. Free time 6 h per drop.' });
+      if (S.rail.cars.length) hv.push({ k: 'rail', text: railFirst + ' propane rail cars due from Saltfleet Refinery around ' + U.clock(S, S.rail.cars[0].arrivalT) + (S.rail.cars.some((c) => c.arrivalT > 5 * 3600) ? ', more after lunch' : '') + '. C-301 lined up to V-102. Free time 6 h per drop.' });
+      else hv.push({ k: 'rail', text: 'No rail deliveries today. C-301 is on standby.' });
       hv.push({ k: 'task', text: 'Weekly P-502 diesel fire pump run test is due today (30 min run, log readings).' });
       hv.push({ k: 'task', text: 'Odorant (ethyl mercaptan) top-up delivery booked for 11:00 — needs a field operator to supervise the transfer. Tank at ' + (S.util.odor.level * 100).toFixed(0) + '%.' });
       const radarEv = S.events.find((e) => e.kind === 'radar');
@@ -4393,74 +4501,190 @@ ${vpTable()}
 })(globalThis.LPG = globalThis.LPG || {});
 
 // ---- js/core/autopilot.js
-/* Autopilot: a competent scripted operator. Drives the headless tests and the live backdrop behind the start screen. */
-(function (L0) {
+/* Autopilot: the crew's brain. A competent operator that reads documents, computes presets and follows procedures.
+   Every action has a category, a title, a reason and a place on the map. A policy decides, per category, whether the
+   crew just does it, asks the player for approval first, or leaves it alone. The same code drives the headless tests,
+   crew autonomy in play, approval requests and the tutorial narration. */
+(function (L) {
   'use strict';
-  // A competent operator: reads documents, computes presets, follows procedures.
-  function goodBot(L, S, style) {
-    style = style || {};
-    const act = (...a) => L.sim.act(S, ...a);
-    const U = L.util;
-    for (const a of S.alarms.slice()) if (!a.acked) L.sim.ackAlarm(S, a.id);
-    if (!S.handover.acked) act('handoverAck');
-    const hold = S.weather.hold;
-    // Emergencies
-    const gas = style.reckless ? [] : S.gd.filter((g) => g.lel >= 20);
-    if (gas.length) {
-      for (const z of new Set(gas.map((g) => g.zone))) {
-        if (z === 'LR') act('bayStopAll');
-        if (z === 'PA') for (const p of Object.values(S.pumps)) if (!p.isolated && L.util.dist(p.x, p.y, gas[0].x, gas[0].y) < 15) act('pumpIsolate', p.id, true);
-        if (z === 'TF') for (const id of S.tankOrder) { const t = S.tanks[id]; if (L.util.dist(t.x, t.y, gas[0].x, gas[0].y) < 20) act('setTankValve', id, 'out', false); }
-        if (z === 'RL') { act('compStop'); for (const c of S.rail.cars) if (c.valvesOpen && c.state !== 'RELEASED') act('railCloseCarValves', c.id); }
+
+  // Categories. FIELD work is done by field operators; ROUTINE by the CCR assistant; DECIDE are key decisions.
+  const FIELD = new Set(['field', 'railField', 'permitPrep', 'gaugeRead', 'emergencyField']);
+  const ROUTINE = new Set(['routine', 'ack', 'handover', 'header', 'bayAssign', 'bayRun', 'railComp', 'utility', 'gaugeSign', 'permitClose', 'emergency']);
+  const DECIDE = new Set(['gate', 'bayHold', 'preset', 'release', 'railSpec', 'permit', 'radar']);
+  const CAT_LABEL = { field: 'Field work', railField: 'Rail', permitPrep: 'Permits', gaugeRead: 'Gauging', emergencyField: 'Emergency', routine: 'Control room', ack: 'Alarms', ackCrit: 'Alarms', handover: 'Handover', header: 'Pumps & headers', bayAssign: 'Loading rack', bayRun: 'Loading rack', railComp: 'Rail', utility: 'Utilities', gaugeSign: 'Gauging', permitClose: 'Permits', emergency: 'Emergency', gate: 'Gate', bayHold: 'Loading rack', preset: 'Loading rack', release: 'Weighbridge', railSpec: 'Rail', permit: 'Permits', radar: 'Gauging' };
+
+  // Policy from the shift settings.
+  function policyFor(S) {
+    const a = S.cfg.autonomy, ap = S.cfg.approvals;
+    return (cat) => {
+      if (a === 'watch') return 'do';
+      if (a === 'off') return 'skip';
+      if (cat === 'ackCrit') return 'skip';
+      if (FIELD.has(cat)) return 'do';
+      if (a === 'field') return 'skip';
+      if (ROUTINE.has(cat)) return 'do';
+      if (DECIDE.has(cat)) return ap === 'auto' ? 'do' : 'ask';
+      return 'skip';
+    };
+  }
+
+  // Where an action happens, for the camera and for icons.
+  function locate(S, name, args) {
+    const bay = (id) => S.bays.find((b) => b.id === id);
+    const tr = (id) => S.trucks.find((t) => t.id === id);
+    const car = (id) => S.rail.cars.find((c) => c.id === id);
+    const carLoc = (c) => c ? { x: c.spotId === 'R1' ? 46 : 86, z: 140.5, kind: 'car', id: c.id, key: 'car:' + c.id } : null;
+    const tk = (id) => S.tanks[id] ? { x: S.tanks[id].x, z: S.tanks[id].y, kind: 'tank', id } : null;
+    switch (name) {
+      case 'gateDecision': return { x: 278, z: 162, kind: 'truck', id: args[0], key: 'trk:' + args[0] };
+      case 'assignBay': return { x: bay(args[1]).x, z: 90, kind: 'bay', id: args[1] };
+      case 'bayChangeover': case 'bayResolve': case 'bayAuthorize': case 'bayStop': case 'bayResume': case 'bayFinish': case 'bayPA': case 'bayReground': case 'baySuspend': case 'bayRepair': { const b = bay(args[0]); return b ? { x: b.x, z: 80, kind: 'bay', id: b.id } : null; }
+      case 'bayStopAll': return { x: 213, z: 80, kind: 'bay', id: 1 };
+      case 'truckRelease': case 'truckDecant': return { x: 218, z: 162, kind: 'truck', id: args[0], key: 'trk:' + args[0] };
+      case 'railSecure': case 'railSample': case 'railConnect': case 'railRelease': case 'railReject': case 'railCloseCarValves': return carLoc(car(args[0]));
+      case 'compLineup': case 'compMode': case 'compStart': case 'compStop': case 'compReset': return { x: 66, z: 124, kind: 'comp', id: 'C301' };
+      case 'gaugeManual': return tk(args[1]);
+      case 'gaugeFlag': return tk(args[1]);
+      case 'gaugeSign': case 'gaugeOpenClosing': return { x: 70, z: 44, kind: 'tank', id: 'V102' };
+      case 'setTankValve': return tk(args[0]);
+      case 'setHeaderSource': return tk(args[1]);
+      case 'pumpIsolate': case 'pumpReset': case 'pumpStop': case 'pumpDuty': { const p = S.pumps[args[0]]; return p ? { x: p.x, z: p.y, kind: 'pump', id: p.id } : null; }
+      case 'permitDecide': case 'permitGasTest': case 'permitVerifyIso': case 'permitClose': { const pm = S.permits.find((x) => x.no === args[0]); return pm ? (pm.status === 'pending' ? { x: 157, z: 158, kind: 'permit', id: pm.no, key: 'pm:' + pm.no + ':a' } : { x: pm.loc.x, z: pm.loc.y, kind: 'permit', id: pm.no, key: 'pm:' + pm.no + ':a' }) : null; }
+      case 'odorRestore': case 'odorDelivery': return { x: 176, z: 64, kind: 'odorant', id: 'T401' };
+      case 'fwPump': return { x: 34, z: 121, kind: 'fwpumps', id: 'FWP' };
+      case 'iaStart': case 'iaStop': return { x: 150, z: 124, kind: 'ia', id: 'IA' };
+      case 'wbZero': return { x: args[0] === 'in' ? 240 : 204, z: 140, kind: 'wb', id: args[0] };
+      case 'crewRounds': return { x: 150, z: 140, kind: 'ccr', id: 'CCR' };
+      case 'handoverAck': return { x: 150, z: 151, kind: 'ccr', id: 'CCR' };
+      case 'callFireBrigade': case 'muster': case 'deluge': case 'esdReset': { const f = S.fires[0]; return f ? { x: f.x, z: f.y, kind: 'ground' } : { x: 150, z: 151, kind: 'ccr', id: 'CCR' }; }
+      case 'crewIsolateField': { const lk = S.leaks.find((l) => l.id === args[0]); return lk ? { x: lk.x, z: lk.y, kind: 'ground' } : null; }
+      default: return null;
+    }
+  }
+
+  // ---------------------------------------------------------------- One decision pass
+  function step(Lx, S, opts) {
+    const L2 = Lx || L;
+    // Accept either step(L, S, { policy, ask, narrate, style }) or the old step(L, S, style).
+    const isOpts = opts && (opts.policy || opts.ask || opts.narrate || opts.style);
+    opts = isOpts ? opts : { style: opts || {} };
+    const style = opts.style || {};
+    const policy = opts.policy || (() => 'do');
+    const U = L2.util, F = U.fmt, P = L2.phys;
+    const asked = opts.asked || null;
+    const act = (name, ...args) => { S._ap = true; try { return L2.sim.act(S, name, ...args); } finally { S._ap = false; } };
+    // go(cat, info, name, ...args): run, ask, or skip according to policy.
+    function go(cat, info, name, ...args) {
+      const p = policy(cat);
+      if (p === 'skip') return false;
+      const loc = info.loc !== undefined ? info.loc : locate(S, name, args);
+      if (p === 'ask') {
+        if (opts.ask) opts.ask({ cat, key: info.akey || (name + ':' + JSON.stringify(args)), title: info.title, why: info.why, name, args, loc });
+        return false;
       }
-      for (const lk of S.leaks) if (lk.src.kind === 'field' && !lk.fixed && !lk.fixReq) { lk.fixReq = true; act('crewIsolateField', lk.id); }
+      const res = act(name, ...args);
+      const ok = !res || res.ok !== false;
+      if (ok && info.title && opts.narrate) opts.narrate({ cat, title: info.title, why: info.why || '', key: info.key || cat, loc, important: !!info.important, name, args });
+      return ok;
+    }
+    const touched = (names, id, mins) => names.some((n) => { const t = S.touch[n + ':' + JSON.stringify(id)]; return t !== undefined && S.t - t < (mins || 15) * 60; });
+    const hold = S.weather.hold;
+
+    // ---------------- Alarms and handover
+    for (const a of S.alarms.slice()) {
+      if (a.acked) continue;
+      const cat = a.pri <= 2 ? 'ackCrit' : 'ack';
+      if (policy(cat) === 'do') L2.sim.ackAlarm(S, a.id);
+    }
+    if (!S.handover.acked) go('handover', { title: 'Shift handover read and signed', why: 'Every shift starts by reading the night shift\'s notes: what is locked out, what is inhibited, what is due today. Handover failures sit behind some of the worst process accidents (Piper Alpha, 1988).', key: 'handover', important: true }, 'handoverAck');
+
+    // ---------------- Emergencies
+    const gas = style.reckless ? [] : S.gd.filter((g) => g.lel >= 20 && !g.inhibited && !g.fault);
+    if (gas.length) {
+      const g0 = gas[0];
+      for (const z of new Set(gas.map((g) => g.zone))) {
+        if (z === 'LR' && S.bays.some((b) => b.state === 'LOADING')) go('emergency', { title: 'Gas on the rack — all bays stopped', why: g0.tag + ' reads ' + Math.round(g0.lel) + '% LEL. Stopping every transfer removes the fuel and keeps drivers from starting engines near the cloud. Investigate before restarting.', key: 'gas-rack', important: true, loc: { x: g0.x, z: g0.y, kind: 'gd', id: g0.id } }, 'bayStopAll');
+        if (z === 'PA') for (const p of Object.values(S.pumps)) if (!p.isolated && U.dist(p.x, p.y, g0.x, g0.y) < 15) go('emergency', { title: p.tag + ' isolated (gas at the pumps)', why: 'Gas near a pump usually means a seal leak. Stopping the pump and closing its suction and discharge valves cuts off the leak.', key: 'gas-pump', important: true }, 'pumpIsolate', p.id, true);
+        if (z === 'TF') for (const id of S.tankOrder) { const t = S.tanks[id]; if (U.dist(t.x, t.y, g0.x, g0.y) < 20 && t.xvOut) go('emergency', { title: t.tag + ' outlet ROSOV closed (gas in the tank farm)', why: 'The leak is close to ' + t.tag + '. Closing its remotely operated outlet valve isolates the manifold from the 500-tonne inventory behind it.', key: 'gas-tank', important: true }, 'setTankValve', id, 'out', false); }
+        if (z === 'RL') { if (S.rail.comp.running) go('emergency', { title: 'C-301 stopped (gas at the rail siding)', why: 'Stop pushing gas around while there is a leak at the siding.', key: 'gas-rail', important: true }, 'compStop'); for (const c of S.rail.cars) if (c.valvesOpen && c.state !== 'RELEASED' && !c.closeReq) { c.closeReq = true; go('emergencyField', { title: 'Field operator sent to close the car valves', why: 'The car valves are manual. A field operator approaches from upwind with a personal gas monitor.', key: 'gas-car', important: true }, 'railCloseCarValves', c.id); } }
+      }
+      for (const lk of S.leaks) if (lk.src.kind === 'field' && !lk.fixed && !lk.fixReq && lk.seen) { lk.fixReq = true; go('emergencyField', { title: 'Field operator sent to shut the manual block valve', why: 'This release is on a line with no remote valve. Someone has to close it by hand, approaching from upwind.', key: 'gas-manual', important: true }, 'crewIsolateField', lk.id); }
     }
     if (S.fires.length && !style.reckless) {
-      if (!S.fireBrigade.called) act('callFireBrigade');
-      if (!S.muster.active) act('muster', true);
-      for (const d of L.data.DELUGE) if (!S.fw.deluge[d.id].open) act('deluge', d.id, true);
-    } else if (S.muster.active && !S.leaks.length) act('muster', false);
+      if (!S.fireBrigade.called) go('emergency', { title: 'Fire service called', why: 'Call early. They take about 12 minutes to arrive and bring cooling capacity the terminal does not have.', key: 'fire-call', important: true }, 'callFireBrigade');
+      if (!S.muster.active) go('emergency', { title: 'General alarm — everyone to the muster point', why: 'Anyone not fighting the emergency goes to the muster point so they can be counted and kept out of harm\'s way. All permits are suspended.', key: 'fire-muster', important: true }, 'muster', true);
+      for (const d of L2.data.DELUGE) if (!S.fw.deluge[d.id].open && !touched(['deluge'], d.id, 5)) go('emergency', { title: d.tag + ' deluge opened', why: 'Water on the shells keeps the steel cool. An uncooled vessel in a fire can fail as a BLEVE within minutes.', key: 'fire-deluge', important: true }, 'deluge', d.id, true);
+    } else if (S.muster.active && !S.leaks.some((l) => l.rate > 0.01) && !touched(['muster'], true, 10)) go('emergency', { title: 'All clear given', why: 'The release is stopped and the gas has cleared, so people can return to their work areas.', key: 'allclear' }, 'muster', false);
     if (!S.fires.length && !S.leaks.some((l) => l.rate > 0.01)) {
-      for (const d of L.data.DELUGE) if (S.fw.deluge[d.id].open) act('deluge', d.id, false);
-      if (S.esd.site) act('esdReset', 'site');
-      for (const z of ['TF', 'PA', 'LR', 'RL']) if (S.esd.zones[z]) act('esdReset', z);
-      if (!S.esd.site && !S.esd.zones.TF) for (const id of S.tankOrder) { const t = S.tanks[id]; if (!t.xvOut && !S.events.some((e) => e.kind === 'flange' && e.id === id && e.state === 'weep')) act('setTankValve', id, 'out', true); if (!t.xvIn && t.fill < 0.84) act('setTankValve', id, 'in', true); }
-      for (const p of Object.values(S.pumps)) if (p.isolated && !p.loto && p.seal !== 'leak') act('pumpIsolate', p.id, false);
+      for (const d of L2.data.DELUGE) if (S.fw.deluge[d.id].open && !touched(['deluge'], d.id, 10)) go('emergency', { title: d.tag + ' deluge closed', why: 'No fire left to cool. Saving fire water.', key: 'deluge-off' }, 'deluge', d.id, false);
+      if (S.esd.site) go('emergency', { title: 'Site ESD reset', why: 'The cause has cleared (no gas above 10% LEL, no fire). Resetting does not restart anything; valves and pumps are brought back one at a time.', key: 'esd-reset', important: true }, 'esdReset', 'site');
+      for (const z of ['TF', 'PA', 'LR', 'RL']) if (S.esd.zones[z]) go('emergency', { title: L2.data.ZONES[z].name + ' ESD reset', why: 'Gas has cleared from the area.', key: 'esd-reset' }, 'esdReset', z);
+      if (!S.esd.site && !S.esd.zones.TF) for (const id of S.tankOrder) {
+        const t = S.tanks[id];
+        if (!t.xvOut && !S.events.some((e) => e.kind === 'flange' && e.id === id && e.state === 'weep') && !touched(['setTankValve'], id)) go('routine', { title: t.tag + ' outlet valve reopened', why: 'Restoring the normal line-up after the area was made safe.', key: 'lineup' }, 'setTankValve', id, 'out', true);
+        if (!t.xvIn && t.fill < 0.84 && !touched(['setTankValve'], id)) go('routine', { title: t.tag + ' inlet valve reopened', why: 'Restoring the line-up.', key: 'lineup' }, 'setTankValve', id, 'in', true);
+      }
+      for (const p of Object.values(S.pumps)) if (p.isolated && !p.loto && p.seal !== 'leak' && !touched(['pumpIsolate'], p.id)) go('routine', { title: p.tag + ' de-isolated', why: 'Gas cleared; the pump is returned to standby.', key: 'lineup' }, 'pumpIsolate', p.id, false);
     }
-    // Utilities
-    for (const c of S.util.ia.comps) if (c.tripped) { const o = S.util.ia.comps.find((x) => x !== c); if (!o.running) act('iaStart', o.id); act('iaStart', c.id); act('iaStop', c.id); }
-    for (const p of Object.values(S.pumps)) if (p.tripped && !p.loto) act('pumpReset', p.id);
-    if (S.util.odor.failed && !S.flags.botOdor) { S.flags.botOdor = true; act('odorRestore'); }
+
+    // ---------------- Utilities
+    for (const c of S.util.ia.comps) if (c.tripped) {
+      const o = S.util.ia.comps.find((x) => x !== c);
+      if (!o.running) go('utility', { title: o.tag + ' standby air compressor started', why: c.tag + ' tripped. Instrument air holds every ROSOV open; below 3.5 barg they all fail closed and the terminal stops.', key: 'ia', important: true }, 'iaStart', o.id);
+      go('utility', { title: c.tag + ' reset and returned to standby', why: '', key: 'ia2' }, 'iaStart', c.id); go('utility', {}, 'iaStop', c.id);
+    }
+    for (const p of Object.values(S.pumps)) if (p.tripped && !p.loto) go('utility', { title: p.tag + ' trip reset', why: 'The pump stopped on ' + p.tripCause + '. Once the cause has cleared, the trip is reset so the auto-start can use it again.', key: 'pumpreset' }, 'pumpReset', p.id);
+    if (S.util.odor.failed && !S.flags.botOdor) { if (go('field', { title: 'Field operator sent to re-prime the odorant pump', why: 'Propane for homes must be odorised (ethyl mercaptan, 25 ppm) so a leak can be smelt. No propane is loaded until injection is back.', key: 'odor', important: true }, 'odorRestore')) S.flags.botOdor = true; }
     if (!S.util.odor.failed) S.flags.botOdor = false;
-    if (S.odorDelivery.arrived && !S.odorDelivery.done && !S.odorDelivery.inProgress) act('odorDelivery');
+    if (S.odorDelivery.arrived && !S.odorDelivery.done && !S.odorDelivery.inProgress) go('field', { title: 'Odorant delivery supervised', why: 'Mercaptan is toxic and smells appalling at tiny concentrations. A field operator watches the whole transfer.', key: 'odordel' }, 'odorDelivery');
     const fwt = S.tasks.find((t) => t.id === 'fwtest');
-    if (fwt.status === 'pending' && S.t >= fwt.startT && !S.fw.diesel.running && !S.fw.diesel.failed) act('fwPump', 'diesel', true);
-    if (S.fw.diesel.tested && S.fw.diesel.running && !S.fires.length) act('fwPump', 'diesel', false);
-    if (S.fw.elec.running && !S.fires.length && !Object.values(S.fw.deluge).some((d) => d.open)) act('fwPump', 'elec', false);
-    for (const k of ['in', 'out']) if (S.wb[k].zero && !S.wb[k].busy) act('wbZero', k);
-    for (const t of S.tasks) if (t.id.startsWith('rounds') && t.status === 'pending' && S.t >= t.startT && !t.botSent) { t.botSent = true; act('crewRounds'); }
-    S.findings.forEach((f, i) => { if (f.kind === 'leak' && f.status === 'open') { const lk = S.leaks.find((x) => x.id === f.leakId); if (lk && lk.src.kind === 'manifold') act('setTankValve', lk.src.id, 'out', false); if (lk && lk.src.kind === 'pump') act('pumpIsolate', lk.src.id, true); } if (f.status === 'open' && !f.botTried) { if (f.kind === 'seal' || f.kind === 'bearing') { const p = S.pumps[f.id]; if (p.running) { const o = Object.values(S.pumps).find((q) => q.product === p.product && q.id !== p.id && !q.loto); if (o) { act('pumpDuty', o.id); act('pumpStop', p.id); } else return; } } if (f.kind === 'flange') act('setTankValve', f.id, 'out', false); f.botTried = true; act('fixFinding', i); } });
-    // Gauging
-    const og = S.gauge.opening;
+    if (fwt && fwt.status === 'pending' && S.t >= fwt.startT && !S.fw.diesel.running && !S.fw.diesel.failed) go('utility', { title: 'Weekly diesel fire pump test started', why: 'Fire pumps that are never run fail when needed. P-502 runs for 30 minutes every week; it is the backup if the power fails during a fire.', key: 'fwtest', important: true }, 'fwPump', 'diesel', true);
+    if (S.fw.diesel.failed && !S.fw.diesel.repairing) go('field', { title: 'P-502 sent for repair', why: 'The test found a fault. That is the point of testing on a quiet day.', key: 'fwrepair', important: true }, 'fwRepair', 'diesel');
+    if (S.fw.diesel.tested && S.fw.diesel.running && !S.fires.length) go('utility', { title: 'Diesel fire pump test complete', why: '', key: 'fwtest2' }, 'fwPump', 'diesel', false);
+    if (S.fw.elec.running && !S.fires.length && !Object.values(S.fw.deluge).some((d) => d.open)) go('utility', {}, 'fwPump', 'elec', false);
+    for (const k of ['in', 'out']) if (S.wb[k].zero && !S.wb[k].busy) go('utility', { title: (k === 'in' ? 'WB-1' : 'WB-2') + ' re-zeroed', why: 'The weighbridge read ' + S.wb[k].zero + ' kg with an empty deck. Every delivery note it prints would be wrong by that much.', key: 'wbzero', important: true }, 'wbZero', k);
+    for (const t of S.tasks) if (t.id.startsWith('rounds') && t.status === 'pending' && S.t >= t.startT && !t.botSent) { if (go('field', { title: 'Field operator sent on plant rounds', why: 'A 40-minute walk-down of every area. Rounds find the weeping seal, the noisy bearing and the slack flange before they become a leak or a trip.', key: 'rounds', important: true }, 'crewRounds')) t.botSent = true; }
+    S.findings.forEach((f, i) => {
+      if (f.kind === 'leak' && f.status === 'open') { const lk = S.leaks.find((x) => x.id === f.leakId); if (lk && lk.src.kind === 'manifold') go('emergency', { title: 'Leaking manifold isolated', why: 'Rounds found a leak downstream of the outlet valve; closing it isolates the leak.', key: 'find-leak', important: true }, 'setTankValve', lk.src.id, 'out', false); if (lk && lk.src.kind === 'pump') go('emergency', { title: 'Leaking pump isolated', why: '', key: 'find-leak' }, 'pumpIsolate', lk.src.id, true); }
+      if (f.status !== 'open' || f.botTried) return;
+      if (f.kind === 'seal' || f.kind === 'bearing') {
+        const p = S.pumps[f.id];
+        if (p.running) { const o = Object.values(S.pumps).find((q) => q.product === p.product && q.id !== p.id && !q.loto); if (!o) return; go('routine', { title: 'Duty swapped to ' + o.tag, why: p.tag + ' needs maintenance, so its standby takes over first.', key: 'dutyswap' }, 'pumpDuty', o.id); go('routine', {}, 'pumpStop', p.id); }
+      }
+      if (f.kind === 'flange') go('routine', { title: S.tanks[f.id].tag + ' outlet closed for flange repair', why: 'The flange is re-torqued only once it is isolated.', key: 'flange' }, 'setTankValve', f.id, 'out', false);
+      const cat = f.kind === 'radar' ? 'radar' : 'field';
+      if (go(cat, { title: f.kind === 'radar' ? 'Radar flagged suspect from rounds' : 'Finding handed to maintenance: ' + f.text.split(':')[0], why: 'Fix the small problem before it becomes the big one.', key: 'finding', important: true, akey: 'finding:' + i }, 'fixFinding', i)) f.botTried = true;
+    });
+
+    // ---------------- Gauging
     const doGauge = (which) => {
       const g = S.gauge[which];
       if (!g || g.status !== 'open') return;
-      for (const id of S.tankOrder) if (g.readings[id].manual === null && !g.readings[id].pending) act('gaugeManual', which, id);
+      for (const id of S.tankOrder) if (g.readings[id].manual === null && !g.readings[id].pending) go('gaugeRead', { title: 'Field operator reading ' + S.tanks[id].tag + '\'s local gauge', why: 'The radar is the control gauge, but it can stick. An independent local reading every shift is how a lying gauge is caught.', key: 'gauge-read' }, 'gaugeManual', which, id);
       if (S.tankOrder.every((id) => g.readings[id].manual !== null)) {
-        for (const id of S.tankOrder) if (Math.abs(g.readings[id].manual - g.readings[id].radarAt) > 10) act('gaugeFlag', which, id, true);
-        act('gaugeSign', which);
+        for (const id of S.tankOrder) {
+          const rd = g.readings[id], d = rd.manual - rd.radarAt;
+          if (Math.abs(d) > 10 && !rd.flag) go('radar', { title: S.tanks[id].tag + ' radar flagged as faulty', why: 'Local gauge ' + rd.manual + ' mm, radar ' + rd.radarAt + ' mm at the same moment: ' + (d > 0 ? '+' : '') + d + ' mm apart. More than ~10 mm on a static tank means the radar is wrong. Receipts into that sphere are watched by hand until the technician fixes it — the Buncefield lesson.', key: 'radar', important: true, akey: 'radar:' + which + ':' + id }, 'gaugeFlag', which, id, true);
+        }
+        go('gaugeSign', { title: (which === 'opening' ? 'Opening' : 'Closing') + ' stock signed', why: 'For each sphere: level → volume from the sphere geometry → corrected to 15 °C → mass, plus the vapour above the liquid. ' + (which === 'closing' ? 'Then book stock (opening + receipts − dispatches) is compared with what the gauges say.' : ''), key: 'gauge-sign:' + which, important: true }, 'gaugeSign', which);
       }
     };
     doGauge('opening');
-    if (S.t > 10.8 * 3600) { act('gaugeOpenClosing'); doGauge('closing'); }
-    // Header lineup
+    if (S.t > 10.8 * 3600) { if (!S.gauge.closing) go('gaugeSign', {}, 'gaugeOpenClosing'); doGauge('closing'); }
+
+    // ---------------- Header line-up
     for (const prod of ['propane', 'butane']) {
       const H = S.headers[prod];
       const src = S.tanks[H.source];
       const alts = S.tankOrder.map((id) => S.tanks[id]).filter((t) => t.product === prod && t.id !== H.source && !t.offspec);
-      if ((src.fillMeas < 0.15 || !src.xvOut) && alts.length) { const best = alts.sort((a, b) => b.fill - a.fill)[0]; if (best.fill > src.fill + 0.1 || !src.xvOut) act('setHeaderSource', prod, best.id); }
+      if ((src.fillMeas < 0.15 || !src.xvOut) && alts.length && !touched(['setHeaderSource'], prod, 20)) {
+        const best = alts.sort((a, b) => b.fill - a.fill)[0];
+        if (best.fill > src.fill + 0.1 || !src.xvOut) go('header', { title: prod[0].toUpperCase() + prod.slice(1) + ' loading switched to ' + best.tag, why: src.xvOut ? src.tag + ' is down to ' + F.pct(src.fillMeas) + '. Below about 10% the pumps lose suction head (NPSH) and start to cavitate.' : src.tag + '\'s outlet is shut, so the pumps would have no suction.', key: 'header', important: true }, 'setHeaderSource', prod, best.id);
+      }
     }
-    // Gate
+
+    // ---------------- Gate
     for (const tr of S.trucks.filter((t) => t.state === 'QUEUE')) {
       const d = tr.docs, today = S.date;
       let reason = null;
@@ -4474,89 +4698,184 @@ ${vpTable()}
       else if (d.tyres !== 'Good') reason = 'tyres';
       if (S.esd.site) continue;
       if (style.reckless) reason = null;
-      act('gateDecision', tr.id, reason ? 'reject' : 'admit', reason);
+      const ds = (ms) => new Date(ms).toISOString().slice(0, 10);
+      if (reason) {
+        const def = L2.rack.GATE_DEFECTS[reason];
+        go('gate', { title: tr.plate + ' refused at the gate: ' + def.reason.toLowerCase(), why: def.lesson, key: 'gate-reject:' + reason, important: true, akey: 'gate:' + tr.id }, 'gateDecision', tr.id, 'reject', reason);
+      } else {
+        go('gate', { title: tr.plate + ' admitted (' + tr.product + ', ' + (tr.order === 'FULL' ? 'full load' : F.kg(tr.order)) + ')', why: 'Documents checked: driver ADR certificate to ' + ds(d.adrDriver) + ', vehicle certificate to ' + ds(d.vehicleCert) + ', tank test due ' + ds(d.tankTest) + ', orange plate 23/' + d.un + ' matches ' + tr.product + ', both extinguishers present, ' + (tr.booked ? 'booked slot ' + U.clock(S, tr.slotT) : 'spot order confirmed by Sales') + '.', key: 'gate-admit', akey: 'gate:' + tr.id }, 'gateDecision', tr.id, 'admit');
+      }
     }
-    // Bays
+
+    // ---------------- Bays
     for (const b of S.bays) {
       const tr = b.truckId && S.trucks.find((x) => x.id === b.truckId);
-      if (b.hold) act('bayResolve', b.id, b.hold.options[0][0]);
-      if (b.state === 'READY' && !hold && !S.simopsHold.LR && !(b.product === 'propane' && S.util.odor.failed)) {
-        const mx = L.rack.maxNet(S, tr);
-        const want = tr.order === 'FULL' ? mx.max : Math.min(tr.order, mx.max);
-        act('bayAuthorize', b.id, style.reckless ? Math.floor(tr.capL * mx.fr * 1.12) : Math.floor(want - 80));
+      if (b.hold) {
+        const opt = b.hold.options[0];
+        go('bayHold', { title: b.tag + ': ' + opt[1].toLowerCase(), why: b.hold.msg + ' The safe answer is to fix the problem, never to override or accept it.', key: 'hold:' + b.hold.key, important: true, akey: 'hold:' + b.id + ':' + b.hold.key }, 'bayResolve', b.id, opt[0]);
       }
-      if (b.state === 'LOADING' && (hold || tr.engineOn || (b.product === 'propane' && S.util.odor.failed))) act('bayStop', b.id);
-      if (b.state === 'STOPPED') {
-        if (tr.engineOn) act('bayPA', b.id);
-        if (b.ground !== 'ok') act('bayReground', b.id);
-        if (b.damaged) act('bayFinish', b.id);
-        else if (!hold && !(b.product === 'propane' && S.util.odor.failed) && !S.gd.some((g) => g.zone === 'LR' && g.lel > 10) && !L.plant.esdActive(S, 'LR') && !S.leaks.some((l) => l.src.kind === 'bay' && l.src.id === b.id && l.reported)) act('bayResume', b.id);
+      if (b.state === 'READY' && !hold && !S.simopsHold.LR && !(b.product === 'propane' && S.util.odor.failed)) {
+        const mx = L2.rack.maxNet(S, tr);
+        const heel = tr.grossIn - tr.tare;
+        const fr = P.PRODUCTS[tr.product].fillRatio;
+        const adr = fr * tr.capL - heel, wt = tr.gvw - tr.grossIn;
+        const want = tr.order === 'FULL' ? mx.max : Math.min(tr.order, mx.max);
+        const preset = style.reckless ? Math.floor(tr.capL * mx.fr * 1.12) : Math.floor(want - 80);
+        go('preset', { title: b.tag + ': loading ' + tr.plate + ', preset ' + F.kg(preset), why: 'Preset = the lowest of: the order (' + (tr.order === 'FULL' ? 'full load' : F.kg(tr.order)) + '); the ADR filling limit ' + F.n0(tr.capL) + ' L × ' + fr + ' kg/L − heel ' + F.kg(heel) + ' = ' + F.kg(adr) + '; and the weight limit ' + F.kg(tr.gvw) + ' − gross in ' + F.kg(tr.grossIn) + ' = ' + F.kg(wt) + '. Less a small margin. ' + (adr < wt ? 'Here the filling ratio limits it.' : 'Here the legal weight limits it.'), key: 'preset', important: true, akey: 'preset:' + b.id + ':' + tr.id }, 'bayAuthorize', b.id, preset);
+      }
+      if (b.state === 'LOADING' && hold) go('bayRun', { title: b.tag + ' stopped for lightning', why: 'Strikes within 10 km: transfers stop and stay stopped until 30 minutes after the last strike inside that radius. Arms stay connected, valves closed.', key: 'lightning', important: true }, 'bayStop', b.id);
+      else if (b.state === 'LOADING' && tr.engineOn) go('bayRun', { title: b.tag + ' stopped: engine running', why: 'A running engine is an ignition source next to the coupling, and a driver in the cab can drive off with the arms connected. Stop first, then talk to the driver.', key: 'engine', important: true }, 'bayStop', b.id);
+      else if (b.state === 'LOADING' && b.product === 'propane' && S.util.odor.failed) go('bayRun', { title: b.tag + ' stopped: odorant injection failed', why: 'Unodorised propane cannot be smelt if it leaks in someone\'s home.', key: 'odor-stop', important: true }, 'bayStop', b.id);
+      if (b.state === 'STOPPED' && !touched(['bayStop', 'bayStopAll'], b.id, 20) && !touched(['bayStopAll'], undefined, 20)) {
+        if (tr.engineOn) go('bayRun', { title: 'Driver told to switch off over the bay PA', why: '', key: 'pa' }, 'bayPA', b.id);
+        if (b.ground !== 'ok') go('bayRun', { title: 'Driver re-attached the earth clamp', why: 'Loading stopped because the earth monitor lost the truck. It restarts only with a proven earth (below 10 Ω).', key: 'reground', important: true }, 'bayReground', b.id);
+        if (b.damaged) go('bayRun', { title: b.tag + ' batch ended after drive-away', why: '', key: 'finish' }, 'bayFinish', b.id);
+        else if (!hold && !(b.product === 'propane' && S.util.odor.failed) && !S.gd.some((g) => g.zone === 'LR' && g.lel > 10) && !L2.plant.esdActive(S, 'LR') && !S.leaks.some((l) => l.src.kind === 'bay' && l.src.id === b.id && l.reported)) go('bayRun', { title: b.tag + ' resumed', why: 'The reason for the stop has cleared.', key: 'resume' }, 'bayResume', b.id);
       }
       const armLeak = S.leaks.find((l) => l.src.kind === 'bay' && l.src.id === b.id && l.reported);
-      if (armLeak && b.state === 'LOADING') act('bayStop', b.id);
-      if (armLeak && b.state === 'STOPPED') act('bayFinish', b.id);
-      if (armLeak && b.state === 'IDLE' && !b.suspended) act('baySuspend', b.id, true);
-      if (b.damaged && b.state === 'IDLE') act('bayRepair', b.id);
-      if (b.suspended && b.repairUntil && S.t > b.repairUntil) act('baySuspend', b.id, false);
+      if (armLeak && b.state === 'LOADING') go('bayRun', { title: b.tag + ' stopped: leak on the loading arm', why: 'The driver reported gas at the swivel. Stopping closes the arm valves and isolates the leak.', key: 'armleak', important: true }, 'bayStop', b.id);
+      if (armLeak && b.state === 'STOPPED') go('bayRun', {}, 'bayFinish', b.id);
+      if (armLeak && b.state === 'IDLE' && !b.suspended) go('bayRun', { title: b.tag + ' taken out of service', why: 'The arm swivel needs repair before anyone loads there again.', key: 'suspend' }, 'baySuspend', b.id, true);
+      if (b.damaged && b.state === 'IDLE') go('bayRun', { title: b.tag + ' arms repaired', why: '', key: 'repair' }, 'bayRepair', b.id);
+      if (b.suspended && b.repairUntil && S.t > b.repairUntil) go('bayRun', { title: b.tag + ' back in service', why: '', key: 'unsuspend' }, 'baySuspend', b.id, false);
     }
     const waiting = S.trucks.filter((t) => t.state === 'PARKED' || t.state === 'DECANT_WAIT').sort((a, b) => a.parkedT - b.parkedT);
     for (const tr of waiting) {
       const b = S.bays.find((x) => x.state === 'IDLE' && !x.truckId && !x.suspended && !x.damaged && x.product === tr.product);
-      if (b) act('assignBay', tr.id, b.id);
+      if (b) go('bayAssign', { title: tr.plate + ' called forward to ' + b.tag, why: b.tag + ' is lined up for ' + b.product + ', the same product as the order. Never send a truck to a bay on the wrong product.', key: 'assign' }, 'assignBay', tr.id, b.id);
       else {
         const sw = S.bays.find((x) => x.swing && x.state === 'IDLE' && !x.truckId && x.product !== tr.product && !waiting.some((w) => w.product === x.product));
-        if (sw) act('bayChangeover', sw.id, tr.product);
+        if (sw) go('bayAssign', { title: sw.tag + ' swung over to ' + tr.product, why: 'Bay 4 can load either product. The line is drained to vapour recovery and the block valves swapped, which takes 10 minutes.', key: 'swing', important: true }, 'bayChangeover', sw.id, tr.product);
       }
     }
     for (const tr of S.trucks.filter((t) => t.state === 'WEIGHED')) {
-      const mx = L.rack.maxNet(S, tr);
-      if (!style.reckless && (tr.grossOut > tr.gvw || tr.content > mx.fr * tr.capL * 1.002)) act('truckDecant', tr.id); else act('truckRelease', tr.id);
+      const mx = L2.rack.maxNet(S, tr);
+      const kgL = tr.content / tr.capL;
+      const meterNet = tr.loaded - tr.vapRet;
+      if (!style.reckless && (tr.grossOut > tr.gvw || tr.content > mx.fr * tr.capL * 1.002)) go('release', { title: tr.plate + ' held for decanting', why: (tr.grossOut > tr.gvw ? 'Gross ' + F.kg(tr.grossOut) + ' is over the ' + F.kg(tr.gvw) + ' legal limit. ' : '') + (tr.content > mx.fr * tr.capL * 1.002 ? 'Content ' + kgL.toFixed(3) + ' kg/L is above the ' + mx.fr + ' filling ratio. ' : '') + 'The excess goes back to the sphere before the truck may leave.', key: 'decant', important: true, akey: 'release:' + tr.id }, 'truckDecant', tr.id);
+      else go('release', { title: tr.plate + ' released with ' + F.kg(tr.wbNet), why: 'Weighbridge net ' + F.kg(tr.wbNet) + ' vs meter net ' + F.kg(meterNet) + ' (' + (tr.mismatch * 100).toFixed(2) + '% apart, limit 0.5%). Gross ' + F.kg(tr.grossOut) + ' within ' + F.kg(tr.gvw) + '. Fill ' + kgL.toFixed(3) + ' kg/L within ' + mx.fr + '. Delivery note and ADR transport document issued.', key: 'release', akey: 'release:' + tr.id }, 'truckRelease', tr.id);
     }
-    // Rail
+
+    // ---------------- Rail
     const comp = S.rail.comp;
     for (const c of S.rail.cars) {
       if (c.state === 'RELEASED' || c.state === 'ENROUTE') continue;
-      if (!c.secured && !c.busy) act('railSecure', c.id);
-      else if (c.secured && !c.sample && !c.busy) act('railSample', c.id);
-      else if (c.secured && !c.connected && !c.busy && c.sample && c.sample.status === 'done' && c.sample.pass) act('railConnect', c.id);
-      if (c.sample && c.sample.status === 'done' && !c.sample.pass && !c.rejected) act('railReject', c.id);
+      if (!c.secured && !c.busy) go('railField', { title: 'Rail car at ' + c.spotId + ' being secured', why: 'Blue flag, derail, chocks and handbrake. A blue flag means people are working on the car and nothing may move it.', key: 'rail-secure', important: true }, 'railSecure', c.id);
+      else if (c.secured && !c.sample && !c.busy) go('railField', { title: 'Sample taken from car ' + c.spotId, why: 'A pressure sample goes to the lab before unloading. Off-spec product cannot be taken back out of a sphere.', key: 'rail-sample', important: true }, 'railSample', c.id);
+      else if (c.secured && !c.connected && !c.busy && c.sample && c.sample.status === 'done' && c.sample.pass) go('railField', { title: 'Car ' + c.spotId + ' connected', why: 'Earth and bonding first, then liquid and vapour hoses, leak test, open the car valves.', key: 'rail-connect' }, 'railConnect', c.id);
+      if (c.sample && c.sample.status === 'done' && !c.sample.pass && !c.rejected) go('railSpec', { title: 'Car ' + c.spotId + ' refused: off specification', why: 'Lab: C4+ ' + c.sample.c4.toFixed(1) + '% against a 5.0% limit. Unloading it would put a whole sphere off-spec and every truck loaded from it after.', key: 'rail-reject', important: true, akey: 'railspec:' + c.id }, 'railReject', c.id);
     }
     const cur = S.rail.cars.find((x) => x.id === comp.lineup && x.state !== 'RELEASED');
-    if (!cur) {
-      const next = S.rail.cars.find((x) => x.connected && x.state !== 'RELEASED' && !x.done);
-      if (next) {
-        const tk = ['V101', 'V102'].map((id) => S.tanks[id]).filter((t) => t.radar && !t.radar.fault).sort((a, b) => a.fill - b.fill)[0] || S.tanks.V101;
-        act('compLineup', next.id, tk.id); act('compMode', 'LIQUID');
+    if (!touched(['compStop', 'compStart', 'compMode', 'compLineup'], undefined, 15)) {
+      if (!cur) {
+        const next = S.rail.cars.find((x) => x.connected && x.state !== 'RELEASED' && !x.done);
+        if (next) {
+          const tk = ['V101', 'V102'].map((id) => S.tanks[id]).filter((t) => t.radar && !t.radar.fault).sort((a, b) => a.fill - b.fill)[0] || S.tanks.V101;
+          go('railComp', { title: 'C-301 lined up: car ' + next.spotId + ' → ' + tk.tag, why: tk.tag + ' has the most room (' + F.pct(tk.fillMeas) + ') and a trusted level gauge.', key: 'comp-lineup' }, 'compLineup', next.id, tk.id);
+          go('railComp', {}, 'compMode', 'LIQUID');
+        }
+      } else if (cur.connected) {
+        const tk = S.tanks[comp.tank];
+        if (comp.running && comp.mode === 'LIQUID' && tk.fillMeas > 0.84) { go('railComp', { title: 'Receipt stopped: ' + tk.tag + ' near high level', why: 'Receipts stop before the 85% high-level alarm. The independent high-high switch at 90% is the last line of defence, not the plan.', key: 'comp-high', important: true }, 'compStop'); const o = tk.id === 'V101' ? 'V102' : 'V101'; if (S.tanks[o].fillMeas < 0.8) go('railComp', {}, 'compLineup', cur.id, o); }
+        if (!comp.running && !comp.tripped && !hold && cur.phase === 'liquid' && S.tanks[comp.tank].fillMeas < 0.84 && !L2.plant.esdActive(S, 'RL')) go('railComp', { title: 'C-301 started: liquid transfer', why: 'The compressor takes vapour from the sphere and pushes it into the top of the car. The extra 2–2.5 bar drives the liquid out through the eduction pipe into the sphere.', key: 'comp-liquid', important: true }, 'compStart');
+        if (cur.phase === 'liquid-done' && comp.mode === 'LIQUID') { go('railComp', { title: 'Liquid finished — switching to vapour recovery', why: 'The sight glass shows vapour only. The 4-way valve is reversed so the compressor now pulls the vapour out of the car: about 1.5 t of propane that would otherwise go back to the refinery.', key: 'comp-vapour', important: true }, 'compStop'); go('railComp', {}, 'compMode', 'VAPOUR'); }
+        if (cur.phase === 'liquid-done' && comp.mode === 'VAPOUR' && !comp.running && cur.P > 1.6 && !hold) go('railComp', {}, 'compStart');
+        if (comp.mode === 'VAPOUR' && comp.running && cur.P < 1.6) { go('railComp', { title: 'Vapour recovery stopped at ' + cur.P.toFixed(1) + ' barg', why: 'Going lower raises the compressor discharge temperature and risks pulling the car toward vacuum.', key: 'comp-stop', important: true }, 'compStop'); cur.done = true; go('railField', { title: 'Car ' + cur.spotId + ' disconnected and released', why: 'Hoses blown down to vapour recovery, valves closed, blue flag removed. The shunter can collect it.', key: 'rail-release' }, 'railRelease', cur.id); }
+        if (comp.running && hold) go('railComp', { title: 'C-301 stopped for lightning', why: 'All transfers stop within 10 km of a strike.', key: 'lightning' }, 'compStop');
       }
-    } else if (cur.connected) {
-      const tk = S.tanks[comp.tank];
-      if (comp.running && comp.mode === 'LIQUID' && tk.fillMeas > 0.84) { act('compStop'); const o = tk.id === 'V101' ? 'V102' : 'V101'; if (S.tanks[o].fillMeas < 0.8) act('compLineup', cur.id, o); }
-      if (!comp.running && !comp.tripped && !hold && cur.phase === 'liquid' && S.tanks[comp.tank].fillMeas < 0.84 && !L.plant.esdActive(S, 'RL')) act('compStart');
-      if (cur.phase === 'liquid-done' && comp.mode === 'LIQUID') { act('compStop'); act('compMode', 'VAPOUR'); }
-      if (cur.phase === 'liquid-done' && comp.mode === 'VAPOUR' && !comp.running && cur.P > 1.6 && !hold) act('compStart');
-      if (comp.mode === 'VAPOUR' && comp.running && cur.P < 1.6) { act('compStop'); cur.done = true; act('railRelease', cur.id); }
-      if (comp.running && hold) act('compStop');
     }
-    if (comp.tripped) act('compReset');
-    // Permits
+    if (comp.tripped) go('railComp', { title: 'C-301 trip reset', why: comp.tripCause, key: 'comp-reset' }, 'compReset');
+
+    // ---------------- Permits
     for (const pm of S.permits) {
       if (pm.status === 'pending') {
-        const as = L.permits.assess(S, pm);
-        if (style.reckless) { act('permitDecide', pm.no, 'approve', { conditions: [] }); continue; }
-        if (as.blockers.length) { act('permitDecide', pm.no, 'reject', { reason: as.blockers[0] }); continue; }
-        if (pm.facts.confined && !pm.isoVerified && !pm.isoReq) { pm.isoReq = true; act('permitVerifyIso', pm.no); continue; }
+        const as = L2.permits.assess(S, pm);
+        const R = L2.permits.REJECT_REASONS, C = L2.permits.CONDITIONS;
+        if (style.reckless) { go('permit', {}, 'permitDecide', pm.no, 'approve', { conditions: [] }); continue; }
+        if (as.blockers.length) { go('permit', { title: pm.no + ' refused: ' + R[as.blockers[0]].toLowerCase(), why: pm.title + '. ' + (L2.permits.lessonFor ? L2.permits.lessonFor(pm, as) : ''), key: 'permit-reject:' + as.blockers[0], important: true, akey: 'permit:' + pm.no }, 'permitDecide', pm.no, 'reject', { reason: as.blockers[0] }); continue; }
+        if (pm.facts.confined && !pm.isoVerified && !pm.isoReq) { if (go('permitPrep', { title: 'Isolation on V-104 being checked on site', why: 'Vessel entry needs positive isolation: spades or removed spools on every nozzle. The area authority checks it physically, not on paper.', key: 'permit-iso', important: true }, 'permitVerifyIso', pm.no)) pm.isoReq = true; continue; }
         if (pm.facts.confined && !pm.isoVerified) continue;
-        if (as.needs.length) { if (!pm.gasTest) act('permitGasTest', pm.no); continue; }
+        if (as.needs.length) { if (!pm.gasTest) go('permitPrep', { title: 'Gas test for ' + pm.no, why: 'A gas test at the work site immediately before work: 0% LEL for hot work, O₂ 19.5–23.5% and under 1% LEL for vessel entry.', key: 'permit-gas', important: true }, 'permitGasTest', pm.no); continue; }
         if (pm.facts.pump && S.pumps[pm.facts.pump].running) continue;
-        const conds = pm.facts.needsCond.slice();
-        if ((pm.ignition || pm.type === 'vehicle') && as.simops.length) { act('permitDecide', pm.no, 'reject', { reason: 'simops' }); continue; }
-        act('permitDecide', pm.no, 'approve', { conditions: conds.filter((c) => c !== 'suspendLR' || as.simops.length) });
+        const conds = pm.facts.needsCond.filter((c) => c !== 'suspendLR' || as.simops.length);
+        if ((pm.ignition || pm.type === 'vehicle') && as.simops.length) { go('permit', { title: pm.no + ' deferred: live operations nearby', why: 'Hot work or a vehicle within 35 m of ' + as.simops.join(', ') + '. Ignition sources and live LPG transfers do not mix (SIMOPS). The contractor can resubmit later.', key: 'permit-simops', important: true, akey: 'permit:' + pm.no }, 'permitDecide', pm.no, 'reject', { reason: 'simops' }); continue; }
+        go('permit', { title: pm.no + ' issued: ' + pm.title, why: (pm.gasTest && pm.gasTest.status === 'done' ? 'Gas test clean (LEL ' + pm.gasTest.lel.toFixed(1) + '%, O₂ ' + pm.gasTest.o2.toFixed(1) + '%). ' : '') + (conds.length ? 'Conditions: ' + conds.map((c) => C[c].toLowerCase()).join('; ') + '.' : 'No special conditions needed.'), key: 'permit-issue', important: true, akey: 'permit:' + pm.no }, 'permitDecide', pm.no, 'approve', { conditions: conds });
       }
-      if (pm.status === 'workdone' || (pm.status === 'suspended' && !S.leaks.length && !S.fires.length)) act('permitClose', pm.no);
+      if (pm.status === 'workdone' || (pm.status === 'suspended' && !S.leaks.length && !S.fires.length)) go('permitClose', { title: pm.no + ' closed', why: 'The work site was inspected and handed back. Closing the permit removes its locks, bypasses and inhibits.', key: 'permit-close' }, 'permitClose', pm.no);
     }
   }
 
-  L0.autopilot = { step: goodBot };
+  // ---------------------------------------------------------------- Autonomy system (crew act on their own in play)
+  L.sim.register({
+    name: 'autonomy', order: 85,
+    tick(S) {
+      const a = S.cfg.autonomy;
+      if (!a || a === 'off' || S.over) return;
+      if (S.t - (S._autoT || -99) < 15) return;
+      S._autoT = S.t;
+      const asked = new Set();
+      step(L, S, {
+        policy: policyFor(S),
+        ask: (q) => {
+          asked.add(q.key);
+          if (S.declined && S.declined[q.key]) return;
+          let ap = S.approvals.find((x) => x.key === q.key);
+          if (!ap) {
+            ap = Object.assign({ id: ++S.approvalSeq, t: S.t, deadline: S.t + 600 }, q);
+            S.approvals.push(ap);
+            L.sim.log(S, 'crew', 'Approval requested: ' + q.title);
+            if (S.cfg.narrate) narrate(S, { cat: q.cat, title: 'Waiting for your approval: ' + q.title, why: q.why, key: 'ask', loc: q.loc, important: true });
+          } else Object.assign(ap, { title: q.title, why: q.why, name: q.name, args: q.args, loc: q.loc });
+        },
+        narrate: (n) => {
+          if (S.cfg.narrate) narrate(S, n);
+          if (!FIELD.has(n.cat) && S.cfg.autonomy !== 'watch') L.sim.log(S, 'crew', 'CCR assistant: ' + n.title);
+        },
+      });
+      // Drop requests the crew no longer needs (the player dealt with it, or the situation changed).
+      S.approvals = S.approvals.filter((x) => asked.has(x.key));
+      // Approvals left unanswered: on 'timeout' the crew act on their recommendation after 10 minutes.
+      if (S.cfg.approvals === 'timeout') for (const ap of S.approvals.slice()) if (S.t >= ap.deadline) runApproval(S, ap, 'No answer from the control room after 10 min — crew went ahead: ');
+    },
+  });
+  function narrate(S, n) {
+    S.narration.push(Object.assign({ id: ++S.narrSeq, t: S.t }, n));
+    if (S.narration.length > 200) S.narration.splice(0, S.narration.length - 200);
+  }
+  function runApproval(S, ap, prefix) {
+    S.approvals = S.approvals.filter((x) => x !== ap);
+    S._ap = true;
+    let res;
+    try { res = L.sim.act(S, ap.name, ...ap.args); } finally { S._ap = false; }
+    const ok = !res || res.ok !== false;
+    if (ok) L.sim.log(S, 'crew', (prefix || 'Approved: ') + ap.title);
+    if (ok && S.cfg.narrate) narrate(S, { cat: ap.cat, title: ap.title, why: ap.why, key: ap.cat, loc: ap.loc });
+    return res;
+  }
+  L.sim.action('approvalAccept', (S, id) => {
+    const ap = S.approvals.find((x) => x.id === id);
+    if (!ap) return { ok: false, msg: 'That request has already been dealt with.' };
+    const res = runApproval(S, ap, 'Approved by you: ');
+    return res && res.ok === false ? res : { ok: true, msg: 'Approved: ' + ap.title };
+  });
+  L.sim.action('approvalDecline', (S, id) => {
+    const ap = S.approvals.find((x) => x.id === id);
+    if (!ap) return { ok: false };
+    S.declined = S.declined || {};
+    S.declined[ap.key] = true;
+    S.approvals = S.approvals.filter((x) => x !== ap);
+    L.sim.log(S, 'crew', 'You declined: ' + ap.title + '. Over to you.');
+    return { ok: true, msg: 'Declined — handle it yourself from the console.' };
+  });
+  L.sim.action('setAutonomy', (S, level, approvals) => {
+    S.cfg.autonomy = level;
+    if (approvals) S.cfg.approvals = approvals;
+    S._autoT = -99;
+    L.sim.log(S, 'crew', 'Crew autonomy set to ' + ({ off: 'none — every order comes from you', field: 'field work', full: 'full — crew run routine work and ask you for key decisions', watch: 'demonstration' }[level] || level) + '.');
+    return { ok: true };
+  });
+
+  L.autopilot = { step, policyFor, locate, CAT_LABEL, FIELD, ROUTINE, DECIDE, narrate };
 })(globalThis.LPG = globalThis.LPG || {});
 
 // ---- js/world/kit.js
@@ -5667,7 +5986,7 @@ ${vpTable()}
         if (c.injured) mode = 'lie';
         else if (c.state === 'walk' || c.state === 'retreat') mode = 'walk';
         else if (c.state === 'work') mode = { gauge: 'gauge', gastest: 'gauge', isolate: 'valve', repair: 'work', rail: 'work', odor: 'work', investigate: 'gauge', rounds: c.roundsMoving ? 'walk' : 'gauge', isolation: 'work' }[k] || 'idle';
-        add({ key: 'crew:' + c.id, role: 'operator', seed: c.id === 'FO1' ? 2 : 0, x: c.x, z: c.y, exact: true, mode, pick: { kind: 'crew', id: c.id }, badge: c.call.replace('Field ', 'F') });
+        add({ key: 'crew:' + c.id, role: 'operator', seed: c.idx * 2 + 1, x: c.x, z: c.y, exact: true, mode, pick: { kind: 'crew', id: c.id }, badge: c.call.replace('Field ', 'F') });
       }
       // Drivers at the bays
       for (const b of S.bays) {
@@ -6087,6 +6406,8 @@ ${vpTable()}
       }
       for (const id of S.tankOrder) { const tk = S.tanks[id]; if (tk.psvLift || tk.lshhTrip || tk.fillMeas > 0.9) add('tk' + id, '!', P1, tk.x, tk.r * 2 + 9, tk.y, tk.tag + ' alarm'); }
       if (S.rail.comp.tripped) add('comp', '!', P2, 66, 8, 124, 'C-301 tripped');
+      // Crew asking for approval: a purple question mark over the place the decision is about.
+      for (const ap of S.approvals || []) if (ap.loc) add('ap' + ap.id, '?', '#7a4fc0', ap.loc.x, 13, ap.loc.z, 'Crew ask: ' + ap.title + ' (click to answer)');
       const seen = new Set();
       for (const w of want) {
         seen.add(w.key);
@@ -7086,8 +7407,21 @@ ${vpTable()}
   const LOCS = [
     ['Tank farm manifolds', 70, 56], ['Pump area', 78, 79], ['Loading rack', 213, 90], ['Rail siding', 66, 132], ['Compressor C-301', 66, 128], ['Odorant skid', 176, 68], ['Fire pumps', 34, 120],
   ];
+  const AUTO = {
+    off: 'You give every order. Field operators wait for you, apart from emergencies they can see.',
+    field: 'Field operators do rounds, gauging, rail connections, gas tests and isolations without being asked. Control-room decisions stay with you.',
+    full: 'Field operators and a CCR assistant run routine work. They bring key decisions (gate, presets, release, rail specs, permits) to you as approvals.',
+    watch: 'An experienced crew runs everything and explains each decision. Take over from the guided-shift card.',
+  };
   V.crew = simple((S) => {
-    let h = '<div class="sec-h"><h2>Field crew & routine</h2><span class="sub">Two field operators · radio log in the side panel</span></div><div class="grid g2">';
+    const n = S.crew.length, a = S.cfg.autonomy, ap = S.cfg.approvals;
+    let h = '<div class="sec-h"><h2>Field crew & routine</h2><span class="sub">' + (n === 1 ? 'One field operator' : n + ' field operators') + ' · radio log in the side panel</span></div>';
+    // How much the crew do without being told.
+    const lvl = (v, lbl) => btn(lbl, 'setAutonomy', [v], 'sm' + (a === v ? '' : ' quiet'), { title: AUTO[v] });
+    h += '<div class="card autoctl"><div class="row sp"><h3>Crew autonomy</h3>' + (S.approvals.length ? pill(S.approvals.length + ' waiting for approval', 'p4') : '') + '</div>';
+    h += '<div class="row">' + lvl('off', 'None') + lvl('field', 'Field work') + lvl('full', 'Full') + (a === 'watch' ? pill('Demonstration crew', 'p4') : '') + '</div><p class="small muted">' + e(AUTO[a] || '') + '</p>';
+    if (a === 'full') h += '<div class="row"><span class="small">Key decisions:</span>' + [['wait', 'Wait for me'], ['timeout', 'Crew act after 10 min'], ['auto', 'Crew decide']].map(([v, lbl]) => btn(lbl, 'setAutonomy', ['full', v], 'sm' + (ap === v ? '' : ' quiet'))).join('') + '</div>';
+    h += '</div><div class="grid g2" style="margin-top:12px">';
     for (const c of S.crew) {
       h += '<div class="card' + (c.injured ? ' crit' : '') + '"><div class="row sp"><h3>' + e(c.name) + ' <span class="tag">' + c.call + '</span></h3>' + (c.injured ? pill('Injured', 'p1') : c.task ? pill(c.state === 'walk' ? 'Walking' : c.state === 'retreat' ? 'Backing out' : 'Working', 'run') : pill('Available', 'ok')) + '</div>';
       h += '<dl class="kv"><dt>Task</dt><dd>' + (c.task ? e(c.task.label) : '—') + '</dd><dt>Queue</dt><dd>' + (c.queue.length ? c.queue.map((t) => e(t.label)).join('<br>') : 'empty') + '</dd><dt>Personal monitor</dt><dd' + ((c.lel || 0) >= 10 ? ' class="flag"' : '') + '>' + Math.round(c.lel || 0) + '% LEL</dd></dl>';
@@ -7115,7 +7449,7 @@ ${vpTable()}
   V.crewLocs = LOCS;
 
   // ------------------------------------------------------------------ Logbook
-  const CATS = { all: 'All', ops: 'Operations', rack: 'Rack', gate: 'Gate', rail: 'Rail', permit: 'Permits', alarm: 'Alarms', radio: 'Radio', safety: 'Safety', weather: 'Weather', score: 'Score', note: 'My notes' };
+  const CATS = { all: 'All', crew: 'Crew', ops: 'Operations', rack: 'Rack', gate: 'Gate', rail: 'Rail', permit: 'Permits', alarm: 'Alarms', radio: 'Radio', safety: 'Safety', weather: 'Weather', score: 'Score', note: 'My notes' };
   V.log = simple((S) => {
     let h = '<div class="sec-h"><h2>Shift log</h2><span class="sub">Everything that happened, newest first</span></div><div class="card"><div class="row">';
     for (const k of Object.keys(CATS)) h += ubtn(CATS[k], 'logFilter', [k], 'sm' + (UI.logFilter === k ? '' : ' quiet'));
@@ -7416,6 +7750,155 @@ ${vpTable()}
   L.hud = { describe, ordersFor, inspector, showOrders, runOrder, tooltip, minimapMount, minimapUpdate, minimapClick, crewActivity };
 })(globalThis.LPG = globalThis.LPG || {});
 
+// ---- js/ui/tutor.js
+/* Guided shift: an intro tour, then live narration of every decision the crew makes, with the camera on the action. */
+(function (L) {
+  'use strict';
+  const U = L.util;
+  const { UI, e } = L.ui;
+
+  const INTRO = [
+    { title: 'Welcome to Harrowmere LPG Terminal', cam: [150, 92, 230, 0.95, -0.35], body: 'Liquefied petroleum gas — propane and butane — arrives here by rail, is stored under pressure, and leaves in road tankers. An experienced crew is about to run a twelve-hour day shift. Just watch: every decision they make is explained on cards like this one. You can pause, look around with the mouse, or take over at any moment.' },
+    { title: 'The spheres', cam: [70, 44, 95, 0.55, -0.2], body: 'These three spheres hold about 1,400 tonnes of LPG as a liquid under its own vapour pressure — around 7 bar for propane on a mild day. The pressure depends on the temperature of the liquid, not on how full the sphere is. That is why they are painted white and ringed with red deluge pipes. The tags show level, pressure and temperature live.' },
+    { title: 'Pumps and the pipe rack', cam: [80, 80, 80, 0.6, 0.3], body: 'Loading pumps draw liquid from the bottom of a sphere and push it along the yellow pipes on the rack to the loading bays. A green lamp means a pump is running. Glowing dots travel along a pipe only while product is really moving.' },
+    { title: 'The loading rack', cam: [213, 82, 85, 0.6, -0.5], body: 'Four bays. A tanker drives in, the driver earths it, connects a liquid arm and a vapour-return arm, and the control room authorises a preset quantity. Watch the arms swing onto the truck while it loads.' },
+    { title: 'Gate and weighbridges', cam: [235, 150, 90, 0.7, -0.6], body: 'Every tanker\'s documents are checked at the gate before it is let in. It is weighed on the way in (WB-1) and again on the way out (WB-2). The outbound weighbridge is the last check before an overloaded tanker reaches public roads.' },
+    { title: 'The rail siding', cam: [66, 132, 90, 0.6, 0.2], body: 'Rail cars of propane are unloaded by compressor, not pump. Pushing vapour into the top of the car drives the liquid out through a pipe to the sphere. Afterwards the compressor is reversed to recover the vapour left in the "empty" car.' },
+    { title: 'The people', cam: [150, 140, 70, 0.6, -0.3], body: 'Orange coveralls are field operators, your hands on the plant. Drivers wear blue, contractors have green helmets, and the gate guard wears a cap. Hover over anyone to see what they are doing. In a normal game you select a field operator and click something to give them an order.' },
+    { title: 'Your screen', cam: [150, 92, 230, 0.95, -0.35], body: 'Top: the clock, game speed and your three scores — safety, throughput and compliance. Right: "Needs you", every decision waiting for you. Bottom: the alarm list. Left: console pages with full detail. Bottom right: the map and view buttons. Try "Underground" to see the buried pipes, and "Levels" to see inside the tanks.' },
+    { title: 'The shift starts now', cam: null, body: 'Each card pauses the action briefly so you can read it. Press Next to move on, or untick "Pause on each card" to let it flow. Smaller events scroll past under "Meanwhile". Press "Take over" whenever you want to run the terminal yourself.' },
+  ];
+  // Keys that always deserve a full card, however often they happen.
+  const ALWAYS = /^(gate-reject|decant|hold:|permit-reject|permit-simops|permit-issue|radar|rail-reject|gas-|fire-|esd-reset|lightning|ask|comp-high|alarm:|lesson:|wbzero|odor)/;
+
+  const T = { active: false, intro: -1, queue: [], cur: null, curStart: 0, curDur: 8, lastNarr: 0, lastLog: 0, seen: {}, follow: true, hold: true, ticker: [], held: false };
+
+  function begin(S) {
+    Object.assign(T, { active: true, intro: 0, queue: [], cur: null, lastNarr: S.narrSeq, lastLog: S.logSeq, seen: {}, ticker: [], held: false });
+    UI.tutorHold = true;
+    showIntro();
+  }
+  function end() { T.active = false; T.cur = null; T.queue = []; UI.tutorHold = false; const el = document.getElementById('tutor'); if (el) { el.hidden = true; el.innerHTML = ''; } }
+
+  function camTo(c) {
+    const W = L.app.W;
+    if (!W || !c) return;
+    W.camCtl.follow = null;
+    W.camCtl.focus(c[0], c[1], c[2]);
+    if (c[3] !== undefined) W.camCtl.want.pitch = c[3];
+    if (c[4] !== undefined) W.camCtl.want.yaw = c[4];
+  }
+  function showIntro() {
+    const it = INTRO[T.intro];
+    if (!it) return;
+    if (it.cam) camTo(it.cam);
+    T.cur = { intro: true, title: it.title, why: it.body };
+    T.curStart = performance.now();
+    T.curDur = 1e9;
+    render();
+  }
+
+  // Turn simulation events into cards (important or first time) or ticker lines.
+  function collect(S) {
+    for (const n of S.narration) {
+      if (n.id <= T.lastNarr) continue;
+      T.lastNarr = n.id;
+      if (!n.title) continue;
+      const card = ALWAYS.test(n.key) || !T.seen[n.key];
+      T.seen[n.key] = true;
+      if (card && n.why) T.queue.push({ eyebrow: L.autopilot.CAT_LABEL[n.cat] || 'Operations', title: n.title, why: n.why, loc: n.loc, t: n.t, decision: L.autopilot.DECIDE.has(n.cat) });
+      else ticker(S, n.title, n.t);
+    }
+    for (const l of S.lessons) if (!l.read) { l.read = true; T.queue.push({ eyebrow: 'Lesson', title: l.title, why: l.body, t: l.t }); }
+    for (const l of S.log) {
+      if (l.id <= T.lastLog) continue;
+      T.lastLog = l.id;
+      if (l.cat === 'gate' && /arrived at the gate/.test(l.text) && !T.seen.arrive) { T.seen.arrive = true; T.queue.push({ eyebrow: 'Gate', title: 'A road tanker has arrived', why: 'The driver hands over the documents at the gatehouse. Before the truck may enter, the crew check them against today\'s date and the booking. Watch what they decide.', loc: { x: 278, z: 162 }, t: l.t }); }
+      else if (l.cat === 'rail' && /placed at spot/.test(l.text) && !T.seen.railArrive) { T.seen.railArrive = true; T.queue.push({ eyebrow: 'Rail', title: 'Rail cars shunted in', why: 'A locomotive has pushed two propane tank cars into the siding. Each holds about 45 tonnes. The free time to unload them is six hours; after that the railway charges demurrage by the hour.', loc: { x: 66, z: 140 }, t: l.t }); }
+      else if (l.cat === 'weather' && /thunderstorm/.test(l.text)) T.queue.push({ eyebrow: 'Weather', title: 'Thunderstorm on the way', why: 'The lightning detector is tracking a storm. If strikes come within 10 km, every transfer must stop until 30 minutes after the last strike inside that radius.', t: l.t });
+      else if (l.cat === 'alarm' && /^ALM P1/.test(l.text)) { const k = 'alarm:' + l.text.slice(0, 40); if (!T.seen[k]) { T.seen[k] = true; T.queue.push({ eyebrow: 'Critical alarm', title: l.text.replace(/^ALM P1 /, ''), why: 'Critical alarms are the ones that need action in minutes. Watch how the crew respond, then click the alarm in the list below to read its response procedure.', t: l.t }); } }
+      else if (l.cat === 'safety' && /IGNITION|INJURED|BLEVE/.test(l.text)) T.queue.push({ eyebrow: 'Incident', title: l.text, why: 'This is what the safety systems and procedures exist to prevent.', t: l.t });
+      else if (l.cat === 'radio' && T.ticker.length < 2 && Math.random() < 0.2) ticker(S, l.text, l.t);
+    }
+    if (T.queue.length > 6) {
+      // Never let the backlog run away: keep decisions and the newest, demote the rest to the ticker.
+      const keep = T.queue.filter((q) => q.decision || q.eyebrow === 'Lesson' || q.eyebrow === 'Incident').slice(-4);
+      for (const q of T.queue) if (!keep.includes(q)) ticker(S, q.title, q.t);
+      T.queue = keep;
+    }
+  }
+  function ticker(S, text, t) {
+    T.ticker.unshift({ text, t });
+    if (T.ticker.length > 4) T.ticker.length = 4;
+  }
+
+  function frame(S) {
+    if (!T.active || !S) return;
+    if (T.intro >= 0) return;
+    collect(S);
+    const now = performance.now();
+    if (T.cur && now - T.curStart > T.curDur * 1000) next();
+    if (!T.cur && T.queue.length) {
+      T.cur = T.queue.shift();
+      T.curStart = now;
+      const words = (T.cur.title + ' ' + (T.cur.why || '')).split(/\s+/).length;
+      T.curDur = U.clamp(words / 3.3, 6, 18);
+      const W = L.app.W;
+      if (T.follow && W && T.cur.loc) {
+        W.camCtl.follow = null;
+        W.camCtl.focus(T.cur.loc.x, T.cur.loc.z, 72);
+        if (T.cur.loc.kind && T.cur.loc.kind !== 'ground') W.sel = { kind: T.cur.loc.kind, id: T.cur.loc.id, key: T.cur.loc.key || null, pos: { x: T.cur.loc.x, z: T.cur.loc.z } };
+      }
+    }
+    UI.tutorHold = T.hold && !!T.cur;
+    render();
+  }
+  function next() {
+    if (T.intro >= 0) {
+      T.intro++;
+      if (T.intro >= INTRO.length) { T.intro = -1; T.cur = null; UI.tutorHold = false; render(); return; }
+      showIntro();
+      return;
+    }
+    T.cur = null;
+    UI.tutorHold = false;
+    render();
+  }
+  function back() { if (T.intro > 0) { T.intro--; showIntro(); } }
+
+  function render() {
+    const el = document.getElementById('tutor');
+    if (!el) return;
+    if (!T.active) { el.hidden = true; return; }
+    const S = L.app.S;
+    el.hidden = false;
+    const c = T.cur;
+    let h = '<div class="tut-in">';
+    if (c) {
+      const el2 = c.intro ? 'Tour ' + (T.intro + 1) + ' of ' + INTRO.length : (S ? U.clock(S, c.t) + ' · ' : '') + e(c.eyebrow || '');
+      h += '<div class="tut-eyebrow">' + (c.decision ? '<span class="pill p4">Decision</span> ' : '') + el2 + '</div><h3>' + e(c.title) + '</h3><p>' + e(c.why || '') + '</p>';
+      if (!c.intro) h += '<div class="tut-bar"><i></i></div>';
+    } else {
+      h += '<div class="tut-eyebrow">Guided shift' + (S ? ' · ' + U.clock(S) : '') + '</div><p class="tut-idle">The crew are working. The next decision will appear here.</p>';
+    }
+    if (T.ticker.length && T.intro < 0) h += '<div class="tut-tick"><b>Meanwhile</b>' + T.ticker.map((x) => '<div><span>' + (S ? U.clock(S, x.t) : '') + '</span> ' + e(x.text) + '</div>').join('') + '</div>';
+    h += '<div class="tut-btns">';
+    if (T.intro > 0) h += '<button type="button" class="btn sm quiet" data-a="ui:tutBack">‹ Back</button>';
+    if (c) h += '<button type="button" class="btn sm" data-a="ui:tutNext">' + (T.intro === INTRO.length - 1 ? 'Start the shift' : 'Next ›') + '</button>';
+    if (T.intro < 0) {
+      h += '<label class="chk"><input type="checkbox" id="tut-hold"' + (T.hold ? ' checked' : '') + ' data-a="ui:tutHold"> Pause on each card</label>';
+      h += '<label class="chk"><input type="checkbox" id="tut-follow"' + (T.follow ? ' checked' : '') + ' data-a="ui:tutFollow"> Camera follows</label>';
+    }
+    h += '<span class="tut-sp"></span><button type="button" class="btn sm ghost" data-a="ui:tutTakeover">Take over</button><button type="button" class="btn sm quiet" data-a="ui:tutExit">Exit tutorial</button></div></div>';
+    L.ui.setHTML(el, h);
+    // The countdown bar moves every frame; set it directly so the card's buttons are not rebuilt.
+    const bar = el.querySelector('.tut-bar i');
+    if (bar && c && !c.intro) bar.style.width = (Math.min(1, (performance.now() - T.curStart) / (T.curDur * 1000)) * 100).toFixed(1) + '%';
+  }
+
+  L.tutor = { T, begin, end, frame, next, back, render, INTRO };
+})(globalThis.LPG = globalThis.LPG || {});
+
 // ---- js/ui/app.js
 /* App shell: start screen, game loop, top bar, navigation, attention queue, alarm summary, modals, audio, debrief. */
 (function (L) {
@@ -7518,18 +8001,22 @@ ${vpTable()}
   let lastAtt = [];
   function renderSide(att) {
     lastAtt = att;
-    const top = att.length ? Math.min(...att.map((a) => a.pri)) : 9;
-    let h = '<div class="needs-h"><button type="button" class="needs-tab' + (UI.sideTab !== 'radio' ? ' on' : '') + '" data-a="ui:sideTab" data-p=\'["needs"]\'>Needs you <span class="badge' + (top <= 1 ? ' p1' : top === 2 ? ' p2' : '') + '">' + att.length + '</span></button><button type="button" class="needs-tab' + (UI.sideTab === 'radio' ? ' on' : '') + '" data-a="ui:sideTab" data-p=\'["radio"]\'>Radio</button><button type="button" class="x" data-a="ui:sideMin" aria-label="' + (UI.sideMin ? 'Expand' : 'Collapse') + '">' + (UI.sideMin ? '▾' : '▴') + '</button></div>';
+    const top = S.approvals.length ? 2 : att.length ? Math.min(...att.map((a) => a.pri)) : 9;
+    let h = '<div class="needs-h"><button type="button" class="needs-tab' + (UI.sideTab !== 'radio' ? ' on' : '') + '" data-a="ui:sideTab" data-p=\'["needs"]\'>Needs you <span class="badge' + (top <= 1 ? ' p1' : top === 2 ? ' p2' : '') + '">' + (att.length + S.approvals.length) + '</span></button><button type="button" class="needs-tab' + (UI.sideTab === 'radio' ? ' on' : '') + '" data-a="ui:sideTab" data-p=\'["radio"]\'>Radio</button><button type="button" class="x" data-a="ui:sideMin" aria-label="' + (UI.sideMin ? 'Expand' : 'Collapse') + '">' + (UI.sideMin ? '▾' : '▴') + '</button></div>';
     if (!UI.sideMin) {
       if (UI.sideTab !== 'radio') {
         h += '<div class="att" data-keep="att">';
-        if (!att.length) h += '<p class="small muted">Nothing waiting. Watch the trends.</p>';
+        for (const ap of S.approvals) {
+          const left = S.cfg.approvals === 'timeout' ? Math.max(0, ap.deadline - S.t) : null;
+          h += '<div class="appr"><div class="appr-h"><span class="pill p4">Approve?</span><span class="small muted">' + e((L.autopilot.CAT_LABEL[ap.cat] || '')) + (left !== null ? ' · crew act in ' + U.dur(left) : '') + '</span></div><b>' + e(ap.title) + '</b><p>' + e(ap.why) + '</p><div class="row">' + btn('Approve', 'approvalAccept', [ap.id], 'sm') + btn('I\'ll handle it', 'approvalDecline', [ap.id], 'sm quiet') + (ap.loc && W ? ubtn('Show me', 'apprShow', [ap.id], 'sm ghost') : '') + '</div></div>';
+        }
+        if (!att.length && !S.approvals.length) h += '<p class="small muted">Nothing waiting. ' + (S.cfg.autonomy === 'off' ? 'Watch the trends.' : 'Your crew are on it.') + '</p>';
         att.slice(0, 12).forEach((a, i) => { h += '<button type="button" data-a="ui:need" data-p="[' + i + ']"><i class="p' + a.pri + '"></i><span>' + e(a.text) + (a.sub ? '<br><small>' + e(a.sub) + '</small>' : '') + '</span><span>' + (a.loc && W ? '⌖' : '›') + '</span></button>'; });
         if (att.length > 12) h += '<p class="small muted">+' + (att.length - 12) + ' more</p>';
         h += '</div>';
       } else {
         h += '<div class="feed" data-keep="feed">';
-        const feed = S.log.filter((l) => ['radio', 'rack', 'gate', 'rail', 'safety', 'ops', 'permit', 'weather'].includes(l.cat) && l.level !== 'hidden').slice(-14).reverse();
+        const feed = S.log.filter((l) => ['radio', 'crew', 'rack', 'gate', 'rail', 'safety', 'ops', 'permit', 'weather'].includes(l.cat) && l.level !== 'hidden').slice(-14).reverse();
         for (const l of feed) h += '<div class="' + (l.cat === 'radio' ? 'radio' : l.level) + '"><span class="t">' + U.clock(S, l.t) + '</span>' + e(l.text) + '</div>';
         h += '</div>';
       }
@@ -7623,6 +8110,12 @@ ${vpTable()}
     } else if (m.type === 'esd') {
       title = 'Emergency shutdown';
       body = '<p>Site ESD closes every ROSOV, stops all pumps, the compressor and the rack, and locks the gate. Use it for a confirmed fire or an uncontrolled release. Area ESDs are on the Fire & gas page.</p><p class="small muted">A spurious site ESD costs throughput; a late one costs far more.</p><div class="row">' + btn('TRIP SITE ESD', 'esd', ['site'], 'danger') + ubtn('Cancel', 'close', [], 'quiet') + '</div>';
+    } else if (m.type === 'takeover') {
+      title = 'Take over the shift';
+      body = '<p>The crew keep the shift exactly where it is. How much should they keep doing for you? You can change this any time on the Crew & tasks page.</p><div class="diffs">';
+      body += '<button type="button" class="diff" data-a="ui:takeover" data-p=\'["easy"]\'><b>Lots of help</b><span>The crew keep running routine work and ask you to approve key decisions. If you do not answer within 10 minutes, they go ahead.</span></button>';
+      body += '<button type="button" class="diff" data-a="ui:takeover" data-p=\'["normal"]\'><b>Some help</b><span>Field operators do rounds, gauging, rail connections and gas tests on their own. Every control-room decision is yours.</span></button>';
+      body += '<button type="button" class="diff" data-a="ui:takeover" data-p=\'["hard"]\'><b>No help</b><span>Every order comes from you. No hints, no auto-pause.</span></button></div>';
     } else if (m.type === 'report') {
       wide = true;
       title = 'End of shift debrief';
@@ -7676,12 +8169,14 @@ ${vpTable()}
     }
     // Pause banner
     let pb = '';
-    if (UI.pauseReason) pb = '<div class="pausebar"><b>Paused:</b> ' + e(UI.pauseReason) + ' <button type="button" class="btn sm quiet" data-a="ui:resume">Resume</button></div>';
+    const tut = L.tutor && L.tutor.T.active;
+    if (tut) { /* the tutorial card has its own controls */ }
+    else if (UI.pauseReason) pb = '<div class="pausebar"><b>Paused:</b> ' + e(UI.pauseReason) + ' <button type="button" class="btn sm quiet" data-a="ui:resume">Resume</button></div>';
     else if (S.over && !UI.modal) pb = '<div class="pausebar paused">Shift over <button type="button" class="btn sm quiet" data-a="ui:modal" data-p=\'["report"]\'>Open debrief</button></div>';
     else if (UI.paused && UI.started && !S.over) pb = '<div class="pausebar paused">Paused <button type="button" class="btn sm quiet" data-a="ui:resume">Resume</button></div>';
     setHTML($('pausebar'), pb);
     // Lesson card
-    const lesson = S.lessons.find((l) => !l.read);
+    const lesson = tut ? null : S.lessons.find((l) => !l.read);
     setHTML($('lesson'), lesson ? '<div class="lesson" role="status"><div class="eyebrow">Lesson</div><h4>' + e(lesson.title) + '</h4><p>' + e(lesson.body) + '</p><div class="row"><button type="button" class="btn sm" data-a="ui:lessonRead" data-p="[' + JSON.stringify(lesson.id) + ']">Got it</button></div></div>' : '');
   }
 
@@ -7765,6 +8260,22 @@ ${vpTable()}
       UIA.nav(a.tab, a.sel === undefined ? null : a.sel);
     },
     sideTab(t) { UI.sideTab = t; UI.sideMin = false; },
+    tutNext() { L.tutor.next(); },
+    tutBack() { L.tutor.back(); },
+    tutHold() { L.tutor.T.hold = !L.tutor.T.hold; if (!L.tutor.T.hold) UI.tutorHold = false; },
+    tutFollow() { L.tutor.T.follow = !L.tutor.T.follow; },
+    tutTakeover() { UI.modal = { type: 'takeover' }; },
+    tutExit() { L.tutor.end(); document.body.classList.remove('tutorial'); showStart(); },
+    takeover(level) {
+      const map = { easy: ['full', 'timeout'], normal: ['field', 'wait'], hard: ['off', 'wait'] }[level];
+      L.tutor.end(); document.body.classList.remove('tutorial');
+      S.cfg.narrate = false;
+      L.sim.act(S, 'setAutonomy', map[0], map[1]);
+      S.settings.autoPause = level !== 'hard'; S.settings.hints = level !== 'hard';
+      UI.modal = null; UI.paused = false;
+    },
+    apprShow(id) { const ap = S.approvals.find((x) => x.id === id); if (ap && ap.loc && W) selectWorld(ap.loc); },
+    autonomy(level, appr) { L.sim.act(S, 'setAutonomy', level, appr); },
     sideMin() { UI.sideMin = !UI.sideMin; },
     closeDrawer() { UI.tab = W ? 'site' : 'overview'; },
     deselect() { if (W) { W.sel = null; W.camCtl.follow = null; } UI.selCrew = null; UI.followKey = null; $('ctx').hidden = true; },
@@ -7851,7 +8362,7 @@ ${vpTable()}
     hb(id) { UI.hbSection = id; },
     lessonRead(id) { const l = S.lessons.find((x) => x.id === id); if (l) l.read = true; },
     newShift() { UI.modal = null; showStart(); },
-    replay() { const seed = S.seed, diff = S.difficulty; UI.modal = null; startShift(diff, seed); },
+    replay() { const seed = S.seed, cfg = Object.assign({}, S.cfg, { narrate: false }), pk = S.difficulty; UI.modal = null; startShift(cfg, seed, pk); },
     reviewLog() { UI.modal = null; UI.tab = 'log'; UI.reviewing = true; },
   };
 
@@ -7894,16 +8405,17 @@ ${vpTable()}
   function frame(ts) {
     const dt = Math.min(0.25, (ts - (lastFrame || ts)) / 1000);
     lastFrame = ts;
-    if (S && UI.started && !UI.paused && !S.over) {
+    if (S && UI.started && !UI.paused && !UI.tutorHold && !S.over) {
       L.sim.tick(S, dt * UI.speed);
       if (S.pauseReq) { UI.paused = true; UI.pauseReason = S.pauseReq; S.pauseReq = null; if (UI.speed > 30) UI.speed = 30; }
       if (S.over) { UI.paused = true; UI.modal = { type: 'report' }; }
     }
     if (W) {
-      if (S && UI.started) W.frame(S, dt, UI.paused || S.over ? 0 : UI.speed);
-      else if (preview) { if (L.autopilot && preview.t - (preview._apT || -99) > 20) { preview._apT = preview.t; L.autopilot.step(L, preview); } L.sim.tick(preview, dt * 20); W.camCtl.want.yaw += dt * 0.04; W.frame(preview, dt, 20); }
+      if (S && UI.started) W.frame(S, dt, UI.paused || UI.tutorHold || S.over ? 0 : UI.speed);
+      else if (preview) { L.sim.tick(preview, dt * 20); W.camCtl.want.yaw += dt * 0.04; W.frame(preview, dt, 20); }
       else W.frame(null, dt, 0);
     }
+    if (S && UI.started && L.tutor && L.tutor.T.active) L.tutor.frame(S);
     if (S && UI.started) {
       V.recordHistory(S);
       if (ts - lastRender > 220) { lastRender = ts; renderAll(); if (UI.hoverPick) L.hud.tooltip(S, UI.hoverPick, UI.hoverX, UI.hoverY); }
@@ -7913,40 +8425,74 @@ ${vpTable()}
     requestAnimationFrame(frame);
   }
 
-  // ------------------------------------------------------------------ Start screen
-  let startDiff = 'operator';
+  // ------------------------------------------------------------------ Start screen and shift settings
+  const PR = D.PRESETS;
+  const PRESET_ORDER = ['easy', 'normal', 'hard', 'expert'];
+  let startPreset = 'easy';
+  let startCfg = Object.assign({}, PR.easy);
+  try { const sv = JSON.parse(store('hmt-cfg') || 'null'); if (sv && sv.cfg) { startCfg = Object.assign({}, PR.normal, sv.cfg); startPreset = sv.preset || 'custom'; } } catch (err) { /* ignore */ }
+  const AUTO_TXT = { off: 'You give every order. Field operators wait for you.', field: 'Field operators do rounds, gauging, rail connections, gas tests and isolations on their own. Control-room decisions are yours.', full: 'Field operators and a CCR assistant run routine work. They bring key decisions — gate, presets, release, permits — to you for approval.' };
+  const APPR_TXT = { wait: 'Key decisions wait until you answer.', timeout: 'If you have not answered in 10 minutes, the crew go ahead with their recommendation.', auto: 'The crew decide everything themselves; you watch and step in.' };
+  function difficultyOf(c) {
+    let p = (6 - c.crew) * 0.8 + ({ off: 3, field: 1.5, full: 0, watch: 0 }[c.autonomy] || 0) + (c.autonomy === 'full' ? ({ wait: 0.6, timeout: 0, auto: -0.5 }[c.approvals] || 0) : 0);
+    p += ({ calm: 0, changeable: 1, stormy: 2.2 }[c.weather] || 0) + (c.trucks - 12) / 4 + ({ few: 0, normal: 1, many: 2.2 }[c.faults] || 0) + c.permits / 3 + c.rail * 0.4 + (c.hints ? 0 : 1) + (c.autoPause ? 0 : 0.6);
+    return p < 6 ? 'Easy' : p < 13 ? 'Normal' : p < 18.5 ? 'Hard' : 'Expert';
+  }
+  function seg(field, opts) {
+    return '<div class="seg" role="group">' + opts.map(([v, lbl]) => '<button type="button" class="' + (startCfg[field] === v ? 'on' : '') + '" data-s="set" data-f="' + field + '" data-v="' + v + '"' + (field === 'approvals' && startCfg.autonomy !== 'full' ? ' disabled' : '') + '>' + lbl + '</button>').join('') + '</div>';
+  }
+  function settingsHTML() {
+    const c = startCfg;
+    let h = '<div class="presets" role="group" aria-label="Presets">';
+    for (const k of PRESET_ORDER) h += '<button type="button" class="preset' + (startPreset === k ? ' on' : '') + '" data-s="preset" data-k="' + k + '"><b>' + PR[k].label + '</b><span>' + PR[k].crew + ' operator' + (PR[k].crew > 1 ? 's' : '') + ' · ' + ({ off: 'no crew autonomy', field: 'crew do field work', full: 'crew run routine work' }[PR[k].autonomy]) + '</span></button>';
+    h += '<button type="button" class="preset' + (startPreset === 'custom' ? ' on' : '') + '" data-s="preset" data-k="custom"><b>Custom</b><span>your own mix</span></button></div>';
+    h += '<div class="setgrid">';
+    h += '<div class="setrow"><div><b>Field operators on site</b><span>More hands get field jobs done sooner.</span></div><div class="stepper"><button type="button" data-s="step" data-f="crew" data-d="-1" aria-label="Fewer operators">−</button><output>' + c.crew + '</output><button type="button" data-s="step" data-f="crew" data-d="1" aria-label="More operators">+</button></div></div>';
+    h += '<div class="setrow"><div><b>Crew autonomy</b><span>' + AUTO_TXT[c.autonomy] + '</span></div>' + seg('autonomy', [['off', 'Off'], ['field', 'Field work'], ['full', 'Full']]) + '</div>';
+    h += '<div class="setrow"><div><b>Key decisions</b><span>' + (c.autonomy === 'full' ? APPR_TXT[c.approvals] : 'Only used with full autonomy.') + '</span></div>' + seg('approvals', [['wait', 'Wait for me'], ['timeout', 'Crew act after 10 min'], ['auto', 'Crew decide']]) + '</div>';
+    h += '<div class="setrow"><div><b>Weather</b><span>' + ({ calm: 'No thunderstorms.', changeable: 'A storm is possible.', stormy: 'Expect lightning stops.' }[c.weather]) + '</span></div>' + seg('weather', [['calm', 'Calm'], ['changeable', 'Changeable'], ['stormy', 'Stormy']]) + '</div>';
+    h += '<div class="setrow"><div><b>Road tankers booked</b><span>' + c.trucks + ' trucks across the shift.</span></div><input type="range" id="set-trucks" min="6" max="28" step="1" value="' + c.trucks + '" data-sf="trucks" aria-label="Road tankers booked"></div>';
+    h += '<div class="setrow"><div><b>Rail deliveries</b><span>Each drop is one or two propane cars.</span></div>' + seg('rail', [[0, 'None'], [1, 'One'], [2, 'Two']]) + '</div>';
+    h += '<div class="setrow"><div><b>Faults and incidents</b><span>Equipment failures, document defects, leaks.</span></div>' + seg('faults', [['few', 'Few'], ['normal', 'Normal'], ['many', 'Many']]) + '</div>';
+    h += '<div class="setrow"><div><b>Permit requests</b><span>' + c.permits + ' contractor jobs needing your signature.</span></div><input type="range" id="set-permits" min="0" max="9" step="1" value="' + c.permits + '" data-sf="permits" aria-label="Permit requests"></div>';
+    h += '<div class="setrow"><div><b>Help</b><span>Hints flag expired documents and suggest presets. Auto-pause stops the clock on critical alarms.</span></div><div class="row"><label class="chk"><input type="checkbox" id="set-hints"' + (c.hints ? ' checked' : '') + ' data-sf="hints"> Hints</label><label class="chk"><input type="checkbox" id="set-ap"' + (c.autoPause ? ' checked' : '') + ' data-sf="autoPause"> Auto-pause</label><label class="chk"><input type="checkbox" id="opt-sound"' + (UI.sound ? ' checked' : '') + '> Alarm horn</label></div></div>';
+    h += '</div><div class="row go-row"><span class="diffbadge">Difficulty: <b>' + difficultyOf(c) + '</b></span><label for="seed" class="small">Seed</label><input id="seed" type="number" min="1" placeholder="random" style="width:120px" value="' + e(store('hmt-seed') || '') + '"><button type="button" class="btn big" data-s="go">Take the shift</button></div>';
+    return h;
+  }
   function showStart() {
+    if (L.tutor) L.tutor.end();
     UI.started = false; UI.paused = true;
     document.body.classList.add('pre');
-    preview = L.sim.create({ seed: 4242, difficulty: 'operator' });
+    preview = L.sim.create({ seed: 4242, config: Object.assign({}, PR.tutorial, { narrate: false }), preset: 'tutorial' });
     if (W) { W.sel = null; W.camCtl.reset(); W.camCtl.want.dist = 175; W.camCtl.want.pitch = 0.62; }
-    // A little life in the backdrop: the autopilot runs a shift that started an hour ago.
-    if (L.autopilot) for (let i = 0; i < 180; i++) { L.autopilot.step(L, preview); L.sim.tick(preview, 20); }
-    const seedVal = store('hmt-seed') || '';
+    for (let i = 0; i < 180; i++) L.sim.tick(preview, 20);
     let h = '<div class="start-in"><div class="hero"><div><div class="eyebrow">HMT · day shift · 06:00–18:00</div><h1>Harrowmere LPG Terminal</h1>';
-    h += '<p class="lede">Take the control room for twelve hours. Road tankers queue at the gate, rail cars of propane wait to be unloaded, contractors want permits, and the plant does what pressurised LPG does in the sun. Keep it safe, keep it moving, keep it by the book.</p></div>';
+    h += '<p class="lede">Run a pressurised LPG terminal for twelve hours. Road tankers queue at the gate, rail cars of propane wait to be unloaded, contractors want permits, and the plant does what LPG does in the sun.</p></div>';
     h += W ? '<div></div></div>' : '<div class="plant-wrap" aria-hidden="true">' + L.plantSvg.build() + '</div></div>';
-    h += '<div><h3 style="margin-bottom:8px">Choose your shift</h3><div class="diffs">';
-    const desc = { trainee: 'Fewer trucks and faults. Hints on documents, presets and weighbridge checks. Auto-pause on critical alarms.', operator: 'A normal busy day. Hints on, auto-pause on critical alarms.', senior: 'Heavy traffic, more faults and permits, no hints, no auto-pause.' };
-    for (const k of ['trainee', 'operator', 'senior']) h += '<button type="button" class="diff' + (startDiff === k ? ' on' : '') + '" data-s="diff" data-k="' + k + '"><b>' + D.DIFFICULTY[k].label + '</b><span>' + desc[k] + '</span><span class="small muted">' + D.DIFFICULTY[k].trucks + ' booked trucks · ' + D.DIFFICULTY[k].permits + ' permits</span></button>';
-    h += '</div></div><div class="row"><label for="seed" class="small">Seed (blank for random)</label><input id="seed" type="number" min="1" style="width:140px" value="' + e(seedVal) + '"><label class="chk"><input type="checkbox" id="opt-sound" checked> Alarm horn</label><button type="button" class="btn" data-s="go" style="font-size:16px;padding:8px 18px">Take the shift</button></div>';
-    h += '<div class="howto"><div><h4>Your site</h4>Drag to pan, right-drag (or two fingers) to rotate, scroll or pinch to zoom. Hover anyone or anything to see what it is doing. Select a field operator, then click a sphere, rail car, skid, detector or open ground to give an order.</div><div><h4>Your desk</h4>The <b>Needs you</b> panel lists every decision waiting on you and flies the camera there. Console pages slide in from the left menu. The alarm list sits along the bottom; click an alarm for its response procedure.</div>';
-    h += '<div><h4>A truck\'s journey</h4>Inspect documents at the gate → weigh in → call to a bay → driver\'s checks → you set the preset and authorise → load → weigh out → you release it, or decant it if it is over the limit.</div>';
-    h += '<div><h4>Rail and spheres</h4>Secure, sample and connect rail cars, then drive the compressor: liquid first, vapour recovery after. Gauge the spheres at the start and end of shift and watch for a radar that lies.</div>';
+    h += '<button type="button" class="watch" data-s="tutorial"><span class="watch-play" aria-hidden="true">▶</span><span><b>Watch a guided shift</b><span>New to terminals, or to the game? Sit back while an experienced crew runs the shift. Cards explain every decision as it happens, and you can take over whenever you like.</span></span></button>';
+    h += '<h3 class="set-h">Or set up your own shift</h3><div id="settings">' + settingsHTML() + '</div>';
+    h += '<div class="howto"><div><h4>Your site</h4>Drag to pan, right-drag (or two fingers) to rotate, scroll or pinch to zoom. Hover anyone or anything to see what it is doing. Select a field operator, then click a sphere, rail car, skid, detector or open ground to give an order.</div><div><h4>Your desk</h4>The <b>Needs you</b> panel lists every decision waiting on you, including approvals your crew ask for. Console pages slide in from the left. Click an alarm for its response procedure.</div>';
+    h += '<div><h4>A truck\'s journey</h4>Inspect documents at the gate → weigh in → call to a bay → driver\'s checks → set the preset and authorise → load → weigh out → release, or decant if it is over the limit.</div>';
     h += '<div><h4>When it goes wrong</h4>A detector reading means a leak upwind. Stop transfers, isolate, keep people out of the cloud, cool what is exposed. The handbook explains every rule and the accidents behind them.</div></div></div>';
     $('start').hidden = false;
     $('start').className = 'start' + (W ? ' over-world' : '');
     $('start').innerHTML = h;
     if (!W) L.plantSvg.update($('start'), preview);
   }
-  function startShift(diff, seed) {
+  function refreshSettings() {
+    const el = document.getElementById('settings');
+    if (el) el.innerHTML = settingsHTML();
+    store('hmt-cfg', JSON.stringify({ preset: startPreset, cfg: startCfg }));
+  }
+  function startShift(cfg, seed, presetKey, tutorial) {
     if (seed) store('hmt-seed', String(seed));
-    S = L.sim.create({ difficulty: diff, seed: seed || undefined });
+    S = L.sim.create({ config: cfg, preset: presetKey || 'custom', seed: seed || undefined });
     preview = null;
     if (W) { W.sel = null; W.hover = null; W.camCtl.reset(); }
     UI.selCrew = null; UI.followKey = null; UI.sideMin = window.innerWidth < 760; UI.sideTab = 'needs';
-    UI.tab = W ? 'site' : 'overview'; UI.sel = {}; UI.hist = {}; UI.lastHist = -1e9; UI.seenToast = S.toastSeq; UI.drafts = {}; UI.modal = null; UI.pauseReason = null; UI.silencedSeq = 0;
-    UI.started = true; UI.paused = false; UI.speed = 30;
+    UI.tab = W ? 'site' : 'overview';
+    UI.sel = {}; UI.hist = {}; UI.lastHist = -1e9; UI.seenToast = S.toastSeq; UI.drafts = {}; UI.modal = null; UI.pauseReason = null; UI.silencedSeq = 0;
+    UI.started = true; UI.paused = false; UI.speed = 30; UI.tutorHold = false;
     document.body.classList.remove('pre');
     UI.alarmMin = window.innerWidth < 640;
     mountedTab = null;
@@ -7954,19 +8500,48 @@ ${vpTable()}
     $('start').innerHTML = '';
     audioInit();
     window.LPG.S = S;
+    if (tutorial && L.tutor) { UI.speed = 30; L.tutor.begin(S); document.body.classList.add('tutorial'); }
+    else document.body.classList.remove('tutorial');
     renderAll();
+  }
+  function startTutorial() {
+    store('hmt-tut-seen', '1');
+    startShift(Object.assign({}, PR.tutorial, { narrate: true }), undefined, 'tutorial', true);
   }
   function onStartClick(ev) {
     const el = ev.target.closest('[data-s]');
-    if (!el) return;
-    if (el.getAttribute('data-s') === 'diff') {
-      startDiff = el.getAttribute('data-k');
-      document.querySelectorAll('.diff').forEach((d) => d.classList.toggle('on', d.getAttribute('data-k') === startDiff));
-    } else if (el.getAttribute('data-s') === 'go') {
+    if (!el || el.disabled) return;
+    const kind = el.getAttribute('data-s');
+    if (kind === 'preset') {
+      const k = el.getAttribute('data-k');
+      startPreset = k;
+      if (PR[k]) startCfg = Object.assign({}, PR[k]);
+      refreshSettings();
+    } else if (kind === 'set') {
+      const f = el.getAttribute('data-f'); let v = el.getAttribute('data-v');
+      if (f === 'rail') v = +v;
+      startCfg[f] = v; startPreset = 'custom'; refreshSettings();
+    } else if (kind === 'step') {
+      const f = el.getAttribute('data-f');
+      startCfg[f] = U.clamp(startCfg[f] + (+el.getAttribute('data-d')), 1, D.PEOPLE.crew.length); startPreset = 'custom'; refreshSettings();
+    } else if (kind === 'tutorial') {
+      const snd = document.getElementById('opt-sound'); if (snd) UI.sound = snd.checked;
+      startTutorial();
+    } else if (kind === 'go') {
       const sv = +document.getElementById('seed').value;
-      UI.sound = document.getElementById('opt-sound').checked;
-      startShift(startDiff, sv > 0 ? Math.floor(sv) : undefined);
+      const snd = document.getElementById('opt-sound'); if (snd) UI.sound = snd.checked;
+      const cfg = Object.assign({}, startCfg, { label: startPreset === 'custom' ? 'Custom (' + difficultyOf(startCfg) + ')' : PR[startPreset].label, base: difficultyOf(startCfg) === 'Easy' ? 'trainee' : difficultyOf(startCfg) === 'Normal' ? 'operator' : 'senior' });
+      startShift(cfg, sv > 0 ? Math.floor(sv) : undefined, startPreset);
     }
+  }
+  function onStartInput(ev) {
+    const t = ev.target;
+    const f = t.getAttribute && t.getAttribute('data-sf');
+    if (!f) return;
+    startCfg[f] = t.type === 'checkbox' ? t.checked : +t.value;
+    startPreset = 'custom';
+    if (t.type === 'range') { const row = t.closest('.setrow'); const sp = row && row.querySelector('span'); if (sp) sp.textContent = f === 'trucks' ? startCfg.trucks + ' trucks across the shift.' : startCfg.permits + ' contractor jobs needing your signature.'; document.querySelectorAll('.preset').forEach((b) => b.classList.toggle('on', b.getAttribute('data-k') === 'custom')); const db = document.querySelector('.diffbadge b'); if (db) db.textContent = difficultyOf(startCfg); store('hmt-cfg', JSON.stringify({ preset: startPreset, cfg: startCfg })); }
+    else refreshSettings();
   }
 
   // ------------------------------------------------------------------ World pointer handling
@@ -8020,6 +8595,7 @@ ${vpTable()}
     if (m(/^(car|comp)/)) return UIA.nav('rail');
     if ((r = m(/^pm(.+)/))) return UIA.nav('permits', r[1]);
     if ((r = m(/^tk(.+)/))) return UIA.nav('tanks', r[1]);
+    if ((r = m(/^ap(\d+)/))) { UI.sideMin = false; UI.sideTab = 'needs'; return UIA.apprShow(+r[1]); }
   }
   function thunder(km) {
     if (!actx || !UI.sound) return;
@@ -8048,6 +8624,9 @@ ${vpTable()}
     document.getElementById('pausebar').addEventListener('click', onClick);
     document.getElementById('lesson').addEventListener('click', onClick);
     document.getElementById('start').addEventListener('click', onStartClick);
+    document.getElementById('start').addEventListener('change', onStartInput);
+    document.getElementById('start').addEventListener('input', (ev) => { if (ev.target.type === 'range') onStartInput(ev); });
+    document.getElementById('tutor').addEventListener('click', onClick);
     document.addEventListener('input', onInput);
     document.addEventListener('change', onInput);
     document.addEventListener('keydown', onKey);
@@ -8055,7 +8634,8 @@ ${vpTable()}
     const release = () => setTimeout(() => { UI.pressed = null; }, 0);
     document.addEventListener('pointerup', release, true);
     document.addEventListener('pointercancel', release, true);
-    showStart();
+    // First visit: start with the guided shift. Afterwards, the settings screen.
+    if (!store('hmt-tut-seen') && W) startTutorial(); else showStart();
     requestAnimationFrame(frame);
   }
 

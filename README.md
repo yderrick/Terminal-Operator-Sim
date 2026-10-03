@@ -4,6 +4,30 @@ A browser game where you run a pressurised LPG terminal for a twelve-hour day sh
 
 Open `index.html` in a browser. No install, no server, no build step needed to play (Three.js is vendored in `vendor/`). `dist/harrowmere-standalone.html` is the same game as one self-contained file that works offline.
 
+## First time? Watch a guided shift
+
+The first time you open the game it plays a **guided shift**. A short tour flies the camera round the spheres, pumps, loading rack, gate and rail siding. Then an experienced crew runs the day while you watch. Every decision appears on a card with the reason behind it: a tanker refused at the gate for an expired certificate, a preset limited by the filling ratio, a permit deferred because of simultaneous operations, a compressor stopped at 1.5 barg. The camera follows the action, and smaller events scroll past under "Meanwhile". You can pause on each card or let it flow, step through at your own pace, and press **Take over** at any moment to run the rest of the shift yourself at the level of help you choose. "Watch a guided shift" on the start screen replays it.
+
+## Shift settings
+
+Pick a preset or set each option yourself. The start screen shows the resulting difficulty.
+
+| Preset | Operators | Crew autonomy | Weather | Traffic | Faults |
+|---|---|---|---|---|---|
+| Easy | 4 | Full: crew run routine work and ask you to approve key decisions; after 10 min without an answer they act on their own | calm | 12 trucks, 1 rail delivery | few |
+| Normal | 3 | Field work: rounds, gauging, rail connections, gas tests and isolations happen without being asked; control-room decisions are yours | changeable | 17 trucks, 2 rail deliveries | normal |
+| Hard | 2 | None: every order comes from you | changeable | 21 trucks | many |
+| Expert | 1 | None | stormy | 25 trucks | many |
+
+- **Field operators on site** (1–6). More hands get field jobs done sooner.
+- **Crew autonomy**: none, field work, or full.
+- **Key decisions** (with full autonomy): wait for you, crew act after 10 minutes, or crew decide.
+- **Weather risk**: calm, changeable or stormy (thunderstorms and the lightning rule).
+- **Rail deliveries** (0–2, one or two cars each), **plant faults** (few, normal, many), **road tankers** and **permit requests** (sliders).
+- **Hints** and **auto-pause on critical alarms**.
+
+With full autonomy a new player can click nothing and still see the crew do the job. They admit good tankers and refuse bad ones, set presets, load, weigh out, unload rail cars and handle permits. When they need you they raise a purple **?** over the place in question and an **Approve? / I'll handle it / Show me** card in *Needs you*. Anything you have just done yourself is left alone. You can change the autonomy level mid-shift on the **Crew & tasks** page.
+
 ## The site
 
 The whole terminal is a live 3D model driven by the simulation: spheres with stair towers and deluge rings, pumps whose fans spin when they run, loading arms that swing onto the tankers, a gate barrier, weighbridges, a rail siding with a shunting locomotive, buildings, light masts, a windsock that follows the real wind, and gas detectors whose LEDs change colour with the reading.
@@ -24,7 +48,7 @@ The whole terminal is a live 3D model driven by the simulation: spheres with sta
 - **Permits.** As area authority, review hot work, confined space entry, electrical isolation, work at height, excavation, vehicle entry, detector inhibits and safety-system overrides. Gas test, verify isolation, check simultaneous operations, attach conditions, issue or refuse, then close at hand-back.
 - **Alarms.** ISA-18.2 priorities with a response procedure behind every alarm. Acknowledge, act, and keep the alarm rate down.
 - **Emergencies.** Gas detectors (20/40% LEL, 2-out-of-N voting), flame detectors, area and site ESD, deluge, fire pumps, muster, fire service. Leaks drift with the wind and can find ignition sources — including your own permits.
-- **Field crew.** Two field operators walk the plant in real time to gauge, gas test, connect rail cars, investigate and do rounds. Rounds find weeping seals, worn bearings and flange leaks before they fail.
+- **Field crew.** One to six field operators walk the plant in real time to gauge, gas test, connect rail cars, investigate and do rounds. Rounds find weeping seals, worn bearings and flange leaks before they fail.
 
 ## What is simulated
 
@@ -47,9 +71,9 @@ All people, companies and the terminal are fictional.
 ```
 index.html              page that loads the scripts below (generated)
 css/hmi.css             ISA-101 style console, light and dark themes
-js/core/                simulation, no DOM: physics, plant, rack, rail, crew, permits, events, scoring, handbook, autopilot
+js/core/                simulation, no DOM: physics, plant, rack, rail, crew, permits, events, scoring, handbook, crew autonomy
 js/world/               3D site (Three.js r128): model kit, static plant, camera, live actors and effects, picking
-js/ui/                  HUD, console pages, inspector and orders
+js/ui/                  HUD, console pages, inspector and orders, guided-shift tutor
 vendor/three.min.js     Three.js r128 (MIT) for offline play; the published build loads it from cdnjs
 tools/build.js          writes index.html and the single-file builds in dist/
 tests/                  headless shifts played by scripted operators

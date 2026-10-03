@@ -99,12 +99,16 @@
   let lastAtt = [];
   function renderSide(att) {
     lastAtt = att;
-    const top = att.length ? Math.min(...att.map((a) => a.pri)) : 9;
-    let h = '<div class="needs-h"><button type="button" class="needs-tab' + (UI.sideTab !== 'radio' ? ' on' : '') + '" data-a="ui:sideTab" data-p=\'["needs"]\'>Needs you <span class="badge' + (top <= 1 ? ' p1' : top === 2 ? ' p2' : '') + '">' + att.length + '</span></button><button type="button" class="needs-tab' + (UI.sideTab === 'radio' ? ' on' : '') + '" data-a="ui:sideTab" data-p=\'["radio"]\'>Radio</button><button type="button" class="x" data-a="ui:sideMin" aria-label="' + (UI.sideMin ? 'Expand' : 'Collapse') + '">' + (UI.sideMin ? '▾' : '▴') + '</button></div>';
+    const top = S.approvals.length ? 2 : att.length ? Math.min(...att.map((a) => a.pri)) : 9;
+    let h = '<div class="needs-h"><button type="button" class="needs-tab' + (UI.sideTab !== 'radio' ? ' on' : '') + '" data-a="ui:sideTab" data-p=\'["needs"]\'>Needs you <span class="badge' + (top <= 1 ? ' p1' : top === 2 ? ' p2' : '') + '">' + (att.length + S.approvals.length) + '</span></button><button type="button" class="needs-tab' + (UI.sideTab === 'radio' ? ' on' : '') + '" data-a="ui:sideTab" data-p=\'["radio"]\'>Radio</button><button type="button" class="x" data-a="ui:sideMin" aria-label="' + (UI.sideMin ? 'Expand' : 'Collapse') + '">' + (UI.sideMin ? '▾' : '▴') + '</button></div>';
     if (!UI.sideMin) {
       if (UI.sideTab !== 'radio') {
         h += '<div class="att" data-keep="att">';
-        if (!att.length) h += '<p class="small muted">Nothing waiting. Watch the trends.</p>';
+        for (const ap of S.approvals) {
+          const left = S.cfg.approvals === 'timeout' ? Math.max(0, ap.deadline - S.t) : null;
+          h += '<div class="appr"><div class="appr-h"><span class="pill p4">Approve?</span><span class="small muted">' + e((L.autopilot.CAT_LABEL[ap.cat] || '')) + (left !== null ? ' · crew act in ' + U.dur(left) : '') + '</span></div><b>' + e(ap.title) + '</b><p>' + e(ap.why) + '</p><div class="row">' + btn('Approve', 'approvalAccept', [ap.id], 'sm') + btn('I\'ll handle it', 'approvalDecline', [ap.id], 'sm quiet') + (ap.loc && W ? ubtn('Show me', 'apprShow', [ap.id], 'sm ghost') : '') + '</div></div>';
+        }
+        if (!att.length && !S.approvals.length) h += '<p class="small muted">Nothing waiting. ' + (S.cfg.autonomy === 'off' ? 'Watch the trends.' : 'Your crew are on it.') + '</p>';
         att.slice(0, 12).forEach((a, i) => { h += '<button type="button" data-a="ui:need" data-p="[' + i + ']"><i class="p' + a.pri + '"></i><span>' + e(a.text) + (a.sub ? '<br><small>' + e(a.sub) + '</small>' : '') + '</span><span>' + (a.loc && W ? '⌖' : '›') + '</span></button>'; });
         if (att.length > 12) h += '<p class="small muted">+' + (att.length - 12) + ' more</p>';
         h += '</div>';
@@ -204,6 +208,12 @@
     } else if (m.type === 'esd') {
       title = 'Emergency shutdown';
       body = '<p>Site ESD closes every ROSOV, stops all pumps, the compressor and the rack, and locks the gate. Use it for a confirmed fire or an uncontrolled release. Area ESDs are on the Fire & gas page.</p><p class="small muted">A spurious site ESD costs throughput; a late one costs far more.</p><div class="row">' + btn('TRIP SITE ESD', 'esd', ['site'], 'danger') + ubtn('Cancel', 'close', [], 'quiet') + '</div>';
+    } else if (m.type === 'takeover') {
+      title = 'Take over the shift';
+      body = '<p>The crew keep the shift exactly where it is. How much should they keep doing for you? You can change this any time on the Crew & tasks page.</p><div class="diffs">';
+      body += '<button type="button" class="diff" data-a="ui:takeover" data-p=\'["easy"]\'><b>Lots of help</b><span>The crew keep running routine work and ask you to approve key decisions. If you do not answer within 10 minutes, they go ahead.</span></button>';
+      body += '<button type="button" class="diff" data-a="ui:takeover" data-p=\'["normal"]\'><b>Some help</b><span>Field operators do rounds, gauging, rail connections and gas tests on their own. Every control-room decision is yours.</span></button>';
+      body += '<button type="button" class="diff" data-a="ui:takeover" data-p=\'["hard"]\'><b>No help</b><span>Every order comes from you. No hints, no auto-pause.</span></button></div>';
     } else if (m.type === 'report') {
       wide = true;
       title = 'End of shift debrief';
@@ -257,12 +267,14 @@
     }
     // Pause banner
     let pb = '';
-    if (UI.pauseReason) pb = '<div class="pausebar"><b>Paused:</b> ' + e(UI.pauseReason) + ' <button type="button" class="btn sm quiet" data-a="ui:resume">Resume</button></div>';
+    const tut = L.tutor && L.tutor.T.active;
+    if (tut) { /* the tutorial card has its own controls */ }
+    else if (UI.pauseReason) pb = '<div class="pausebar"><b>Paused:</b> ' + e(UI.pauseReason) + ' <button type="button" class="btn sm quiet" data-a="ui:resume">Resume</button></div>';
     else if (S.over && !UI.modal) pb = '<div class="pausebar paused">Shift over <button type="button" class="btn sm quiet" data-a="ui:modal" data-p=\'["report"]\'>Open debrief</button></div>';
     else if (UI.paused && UI.started && !S.over) pb = '<div class="pausebar paused">Paused <button type="button" class="btn sm quiet" data-a="ui:resume">Resume</button></div>';
     setHTML($('pausebar'), pb);
     // Lesson card
-    const lesson = S.lessons.find((l) => !l.read);
+    const lesson = tut ? null : S.lessons.find((l) => !l.read);
     setHTML($('lesson'), lesson ? '<div class="lesson" role="status"><div class="eyebrow">Lesson</div><h4>' + e(lesson.title) + '</h4><p>' + e(lesson.body) + '</p><div class="row"><button type="button" class="btn sm" data-a="ui:lessonRead" data-p="[' + JSON.stringify(lesson.id) + ']">Got it</button></div></div>' : '');
   }
 
@@ -346,6 +358,22 @@
       UIA.nav(a.tab, a.sel === undefined ? null : a.sel);
     },
     sideTab(t) { UI.sideTab = t; UI.sideMin = false; },
+    tutNext() { L.tutor.next(); },
+    tutBack() { L.tutor.back(); },
+    tutHold() { L.tutor.T.hold = !L.tutor.T.hold; if (!L.tutor.T.hold) UI.tutorHold = false; },
+    tutFollow() { L.tutor.T.follow = !L.tutor.T.follow; },
+    tutTakeover() { UI.modal = { type: 'takeover' }; },
+    tutExit() { L.tutor.end(); document.body.classList.remove('tutorial'); showStart(); },
+    takeover(level) {
+      const map = { easy: ['full', 'timeout'], normal: ['field', 'wait'], hard: ['off', 'wait'] }[level];
+      L.tutor.end(); document.body.classList.remove('tutorial');
+      S.cfg.narrate = false;
+      L.sim.act(S, 'setAutonomy', map[0], map[1]);
+      S.settings.autoPause = level !== 'hard'; S.settings.hints = level !== 'hard';
+      UI.modal = null; UI.paused = false;
+    },
+    apprShow(id) { const ap = S.approvals.find((x) => x.id === id); if (ap && ap.loc && W) selectWorld(ap.loc); },
+    autonomy(level, appr) { L.sim.act(S, 'setAutonomy', level, appr); },
     sideMin() { UI.sideMin = !UI.sideMin; },
     closeDrawer() { UI.tab = W ? 'site' : 'overview'; },
     deselect() { if (W) { W.sel = null; W.camCtl.follow = null; } UI.selCrew = null; UI.followKey = null; $('ctx').hidden = true; },
@@ -432,7 +460,7 @@
     hb(id) { UI.hbSection = id; },
     lessonRead(id) { const l = S.lessons.find((x) => x.id === id); if (l) l.read = true; },
     newShift() { UI.modal = null; showStart(); },
-    replay() { const seed = S.seed, diff = S.difficulty; UI.modal = null; startShift(diff, seed); },
+    replay() { const seed = S.seed, cfg = Object.assign({}, S.cfg, { narrate: false }), pk = S.difficulty; UI.modal = null; startShift(cfg, seed, pk); },
     reviewLog() { UI.modal = null; UI.tab = 'log'; UI.reviewing = true; },
   };
 
@@ -475,16 +503,17 @@
   function frame(ts) {
     const dt = Math.min(0.25, (ts - (lastFrame || ts)) / 1000);
     lastFrame = ts;
-    if (S && UI.started && !UI.paused && !S.over) {
+    if (S && UI.started && !UI.paused && !UI.tutorHold && !S.over) {
       L.sim.tick(S, dt * UI.speed);
       if (S.pauseReq) { UI.paused = true; UI.pauseReason = S.pauseReq; S.pauseReq = null; if (UI.speed > 30) UI.speed = 30; }
       if (S.over) { UI.paused = true; UI.modal = { type: 'report' }; }
     }
     if (W) {
-      if (S && UI.started) W.frame(S, dt, UI.paused || S.over ? 0 : UI.speed);
-      else if (preview) { if (L.autopilot && preview.t - (preview._apT || -99) > 20) { preview._apT = preview.t; L.autopilot.step(L, preview); } L.sim.tick(preview, dt * 20); W.camCtl.want.yaw += dt * 0.04; W.frame(preview, dt, 20); }
+      if (S && UI.started) W.frame(S, dt, UI.paused || UI.tutorHold || S.over ? 0 : UI.speed);
+      else if (preview) { L.sim.tick(preview, dt * 20); W.camCtl.want.yaw += dt * 0.04; W.frame(preview, dt, 20); }
       else W.frame(null, dt, 0);
     }
+    if (S && UI.started && L.tutor && L.tutor.T.active) L.tutor.frame(S);
     if (S && UI.started) {
       V.recordHistory(S);
       if (ts - lastRender > 220) { lastRender = ts; renderAll(); if (UI.hoverPick) L.hud.tooltip(S, UI.hoverPick, UI.hoverX, UI.hoverY); }
@@ -494,40 +523,74 @@
     requestAnimationFrame(frame);
   }
 
-  // ------------------------------------------------------------------ Start screen
-  let startDiff = 'operator';
+  // ------------------------------------------------------------------ Start screen and shift settings
+  const PR = D.PRESETS;
+  const PRESET_ORDER = ['easy', 'normal', 'hard', 'expert'];
+  let startPreset = 'easy';
+  let startCfg = Object.assign({}, PR.easy);
+  try { const sv = JSON.parse(store('hmt-cfg') || 'null'); if (sv && sv.cfg) { startCfg = Object.assign({}, PR.normal, sv.cfg); startPreset = sv.preset || 'custom'; } } catch (err) { /* ignore */ }
+  const AUTO_TXT = { off: 'You give every order. Field operators wait for you.', field: 'Field operators do rounds, gauging, rail connections, gas tests and isolations on their own. Control-room decisions are yours.', full: 'Field operators and a CCR assistant run routine work. They bring key decisions — gate, presets, release, permits — to you for approval.' };
+  const APPR_TXT = { wait: 'Key decisions wait until you answer.', timeout: 'If you have not answered in 10 minutes, the crew go ahead with their recommendation.', auto: 'The crew decide everything themselves; you watch and step in.' };
+  function difficultyOf(c) {
+    let p = (6 - c.crew) * 0.8 + ({ off: 3, field: 1.5, full: 0, watch: 0 }[c.autonomy] || 0) + (c.autonomy === 'full' ? ({ wait: 0.6, timeout: 0, auto: -0.5 }[c.approvals] || 0) : 0);
+    p += ({ calm: 0, changeable: 1, stormy: 2.2 }[c.weather] || 0) + (c.trucks - 12) / 4 + ({ few: 0, normal: 1, many: 2.2 }[c.faults] || 0) + c.permits / 3 + c.rail * 0.4 + (c.hints ? 0 : 1) + (c.autoPause ? 0 : 0.6);
+    return p < 6 ? 'Easy' : p < 13 ? 'Normal' : p < 18.5 ? 'Hard' : 'Expert';
+  }
+  function seg(field, opts) {
+    return '<div class="seg" role="group">' + opts.map(([v, lbl]) => '<button type="button" class="' + (startCfg[field] === v ? 'on' : '') + '" data-s="set" data-f="' + field + '" data-v="' + v + '"' + (field === 'approvals' && startCfg.autonomy !== 'full' ? ' disabled' : '') + '>' + lbl + '</button>').join('') + '</div>';
+  }
+  function settingsHTML() {
+    const c = startCfg;
+    let h = '<div class="presets" role="group" aria-label="Presets">';
+    for (const k of PRESET_ORDER) h += '<button type="button" class="preset' + (startPreset === k ? ' on' : '') + '" data-s="preset" data-k="' + k + '"><b>' + PR[k].label + '</b><span>' + PR[k].crew + ' operator' + (PR[k].crew > 1 ? 's' : '') + ' · ' + ({ off: 'no crew autonomy', field: 'crew do field work', full: 'crew run routine work' }[PR[k].autonomy]) + '</span></button>';
+    h += '<button type="button" class="preset' + (startPreset === 'custom' ? ' on' : '') + '" data-s="preset" data-k="custom"><b>Custom</b><span>your own mix</span></button></div>';
+    h += '<div class="setgrid">';
+    h += '<div class="setrow"><div><b>Field operators on site</b><span>More hands get field jobs done sooner.</span></div><div class="stepper"><button type="button" data-s="step" data-f="crew" data-d="-1" aria-label="Fewer operators">−</button><output>' + c.crew + '</output><button type="button" data-s="step" data-f="crew" data-d="1" aria-label="More operators">+</button></div></div>';
+    h += '<div class="setrow"><div><b>Crew autonomy</b><span>' + AUTO_TXT[c.autonomy] + '</span></div>' + seg('autonomy', [['off', 'Off'], ['field', 'Field work'], ['full', 'Full']]) + '</div>';
+    h += '<div class="setrow"><div><b>Key decisions</b><span>' + (c.autonomy === 'full' ? APPR_TXT[c.approvals] : 'Only used with full autonomy.') + '</span></div>' + seg('approvals', [['wait', 'Wait for me'], ['timeout', 'Crew act after 10 min'], ['auto', 'Crew decide']]) + '</div>';
+    h += '<div class="setrow"><div><b>Weather</b><span>' + ({ calm: 'No thunderstorms.', changeable: 'A storm is possible.', stormy: 'Expect lightning stops.' }[c.weather]) + '</span></div>' + seg('weather', [['calm', 'Calm'], ['changeable', 'Changeable'], ['stormy', 'Stormy']]) + '</div>';
+    h += '<div class="setrow"><div><b>Road tankers booked</b><span>' + c.trucks + ' trucks across the shift.</span></div><input type="range" id="set-trucks" min="6" max="28" step="1" value="' + c.trucks + '" data-sf="trucks" aria-label="Road tankers booked"></div>';
+    h += '<div class="setrow"><div><b>Rail deliveries</b><span>Each drop is one or two propane cars.</span></div>' + seg('rail', [[0, 'None'], [1, 'One'], [2, 'Two']]) + '</div>';
+    h += '<div class="setrow"><div><b>Faults and incidents</b><span>Equipment failures, document defects, leaks.</span></div>' + seg('faults', [['few', 'Few'], ['normal', 'Normal'], ['many', 'Many']]) + '</div>';
+    h += '<div class="setrow"><div><b>Permit requests</b><span>' + c.permits + ' contractor jobs needing your signature.</span></div><input type="range" id="set-permits" min="0" max="9" step="1" value="' + c.permits + '" data-sf="permits" aria-label="Permit requests"></div>';
+    h += '<div class="setrow"><div><b>Help</b><span>Hints flag expired documents and suggest presets. Auto-pause stops the clock on critical alarms.</span></div><div class="row"><label class="chk"><input type="checkbox" id="set-hints"' + (c.hints ? ' checked' : '') + ' data-sf="hints"> Hints</label><label class="chk"><input type="checkbox" id="set-ap"' + (c.autoPause ? ' checked' : '') + ' data-sf="autoPause"> Auto-pause</label><label class="chk"><input type="checkbox" id="opt-sound"' + (UI.sound ? ' checked' : '') + '> Alarm horn</label></div></div>';
+    h += '</div><div class="row go-row"><span class="diffbadge">Difficulty: <b>' + difficultyOf(c) + '</b></span><label for="seed" class="small">Seed</label><input id="seed" type="number" min="1" placeholder="random" style="width:120px" value="' + e(store('hmt-seed') || '') + '"><button type="button" class="btn big" data-s="go">Take the shift</button></div>';
+    return h;
+  }
   function showStart() {
+    if (L.tutor) L.tutor.end();
     UI.started = false; UI.paused = true;
     document.body.classList.add('pre');
-    preview = L.sim.create({ seed: 4242, difficulty: 'operator' });
+    preview = L.sim.create({ seed: 4242, config: Object.assign({}, PR.tutorial, { narrate: false }), preset: 'tutorial' });
     if (W) { W.sel = null; W.camCtl.reset(); W.camCtl.want.dist = 175; W.camCtl.want.pitch = 0.62; }
-    // A little life in the backdrop: the autopilot runs a shift that started an hour ago.
-    if (L.autopilot) for (let i = 0; i < 180; i++) { L.autopilot.step(L, preview); L.sim.tick(preview, 20); }
-    const seedVal = store('hmt-seed') || '';
+    for (let i = 0; i < 180; i++) L.sim.tick(preview, 20);
     let h = '<div class="start-in"><div class="hero"><div><div class="eyebrow">HMT · day shift · 06:00–18:00</div><h1>Harrowmere LPG Terminal</h1>';
-    h += '<p class="lede">Take the control room for twelve hours. Road tankers queue at the gate, rail cars of propane wait to be unloaded, contractors want permits, and the plant does what pressurised LPG does in the sun. Keep it safe, keep it moving, keep it by the book.</p></div>';
+    h += '<p class="lede">Run a pressurised LPG terminal for twelve hours. Road tankers queue at the gate, rail cars of propane wait to be unloaded, contractors want permits, and the plant does what LPG does in the sun.</p></div>';
     h += W ? '<div></div></div>' : '<div class="plant-wrap" aria-hidden="true">' + L.plantSvg.build() + '</div></div>';
-    h += '<div><h3 style="margin-bottom:8px">Choose your shift</h3><div class="diffs">';
-    const desc = { trainee: 'Fewer trucks and faults. Hints on documents, presets and weighbridge checks. Auto-pause on critical alarms.', operator: 'A normal busy day. Hints on, auto-pause on critical alarms.', senior: 'Heavy traffic, more faults and permits, no hints, no auto-pause.' };
-    for (const k of ['trainee', 'operator', 'senior']) h += '<button type="button" class="diff' + (startDiff === k ? ' on' : '') + '" data-s="diff" data-k="' + k + '"><b>' + D.DIFFICULTY[k].label + '</b><span>' + desc[k] + '</span><span class="small muted">' + D.DIFFICULTY[k].trucks + ' booked trucks · ' + D.DIFFICULTY[k].permits + ' permits</span></button>';
-    h += '</div></div><div class="row"><label for="seed" class="small">Seed (blank for random)</label><input id="seed" type="number" min="1" style="width:140px" value="' + e(seedVal) + '"><label class="chk"><input type="checkbox" id="opt-sound" checked> Alarm horn</label><button type="button" class="btn" data-s="go" style="font-size:16px;padding:8px 18px">Take the shift</button></div>';
-    h += '<div class="howto"><div><h4>Your site</h4>Drag to pan, right-drag (or two fingers) to rotate, scroll or pinch to zoom. Hover anyone or anything to see what it is doing. Select a field operator, then click a sphere, rail car, skid, detector or open ground to give an order.</div><div><h4>Your desk</h4>The <b>Needs you</b> panel lists every decision waiting on you and flies the camera there. Console pages slide in from the left menu. The alarm list sits along the bottom; click an alarm for its response procedure.</div>';
-    h += '<div><h4>A truck\'s journey</h4>Inspect documents at the gate → weigh in → call to a bay → driver\'s checks → you set the preset and authorise → load → weigh out → you release it, or decant it if it is over the limit.</div>';
-    h += '<div><h4>Rail and spheres</h4>Secure, sample and connect rail cars, then drive the compressor: liquid first, vapour recovery after. Gauge the spheres at the start and end of shift and watch for a radar that lies.</div>';
+    h += '<button type="button" class="watch" data-s="tutorial"><span class="watch-play" aria-hidden="true">▶</span><span><b>Watch a guided shift</b><span>New to terminals, or to the game? Sit back while an experienced crew runs the shift. Cards explain every decision as it happens, and you can take over whenever you like.</span></span></button>';
+    h += '<h3 class="set-h">Or set up your own shift</h3><div id="settings">' + settingsHTML() + '</div>';
+    h += '<div class="howto"><div><h4>Your site</h4>Drag to pan, right-drag (or two fingers) to rotate, scroll or pinch to zoom. Hover anyone or anything to see what it is doing. Select a field operator, then click a sphere, rail car, skid, detector or open ground to give an order.</div><div><h4>Your desk</h4>The <b>Needs you</b> panel lists every decision waiting on you, including approvals your crew ask for. Console pages slide in from the left. Click an alarm for its response procedure.</div>';
+    h += '<div><h4>A truck\'s journey</h4>Inspect documents at the gate → weigh in → call to a bay → driver\'s checks → set the preset and authorise → load → weigh out → release, or decant if it is over the limit.</div>';
     h += '<div><h4>When it goes wrong</h4>A detector reading means a leak upwind. Stop transfers, isolate, keep people out of the cloud, cool what is exposed. The handbook explains every rule and the accidents behind them.</div></div></div>';
     $('start').hidden = false;
     $('start').className = 'start' + (W ? ' over-world' : '');
     $('start').innerHTML = h;
     if (!W) L.plantSvg.update($('start'), preview);
   }
-  function startShift(diff, seed) {
+  function refreshSettings() {
+    const el = document.getElementById('settings');
+    if (el) el.innerHTML = settingsHTML();
+    store('hmt-cfg', JSON.stringify({ preset: startPreset, cfg: startCfg }));
+  }
+  function startShift(cfg, seed, presetKey, tutorial) {
     if (seed) store('hmt-seed', String(seed));
-    S = L.sim.create({ difficulty: diff, seed: seed || undefined });
+    S = L.sim.create({ config: cfg, preset: presetKey || 'custom', seed: seed || undefined });
     preview = null;
     if (W) { W.sel = null; W.hover = null; W.camCtl.reset(); }
     UI.selCrew = null; UI.followKey = null; UI.sideMin = window.innerWidth < 760; UI.sideTab = 'needs';
-    UI.tab = W ? 'site' : 'overview'; UI.sel = {}; UI.hist = {}; UI.lastHist = -1e9; UI.seenToast = S.toastSeq; UI.drafts = {}; UI.modal = null; UI.pauseReason = null; UI.silencedSeq = 0;
-    UI.started = true; UI.paused = false; UI.speed = 30;
+    UI.tab = W ? 'site' : 'overview';
+    UI.sel = {}; UI.hist = {}; UI.lastHist = -1e9; UI.seenToast = S.toastSeq; UI.drafts = {}; UI.modal = null; UI.pauseReason = null; UI.silencedSeq = 0;
+    UI.started = true; UI.paused = false; UI.speed = 30; UI.tutorHold = false;
     document.body.classList.remove('pre');
     UI.alarmMin = window.innerWidth < 640;
     mountedTab = null;
@@ -535,19 +598,48 @@
     $('start').innerHTML = '';
     audioInit();
     window.LPG.S = S;
+    if (tutorial && L.tutor) { UI.speed = 30; L.tutor.begin(S); document.body.classList.add('tutorial'); }
+    else document.body.classList.remove('tutorial');
     renderAll();
+  }
+  function startTutorial() {
+    store('hmt-tut-seen', '1');
+    startShift(Object.assign({}, PR.tutorial, { narrate: true }), undefined, 'tutorial', true);
   }
   function onStartClick(ev) {
     const el = ev.target.closest('[data-s]');
-    if (!el) return;
-    if (el.getAttribute('data-s') === 'diff') {
-      startDiff = el.getAttribute('data-k');
-      document.querySelectorAll('.diff').forEach((d) => d.classList.toggle('on', d.getAttribute('data-k') === startDiff));
-    } else if (el.getAttribute('data-s') === 'go') {
+    if (!el || el.disabled) return;
+    const kind = el.getAttribute('data-s');
+    if (kind === 'preset') {
+      const k = el.getAttribute('data-k');
+      startPreset = k;
+      if (PR[k]) startCfg = Object.assign({}, PR[k]);
+      refreshSettings();
+    } else if (kind === 'set') {
+      const f = el.getAttribute('data-f'); let v = el.getAttribute('data-v');
+      if (f === 'rail') v = +v;
+      startCfg[f] = v; startPreset = 'custom'; refreshSettings();
+    } else if (kind === 'step') {
+      const f = el.getAttribute('data-f');
+      startCfg[f] = U.clamp(startCfg[f] + (+el.getAttribute('data-d')), 1, D.PEOPLE.crew.length); startPreset = 'custom'; refreshSettings();
+    } else if (kind === 'tutorial') {
+      const snd = document.getElementById('opt-sound'); if (snd) UI.sound = snd.checked;
+      startTutorial();
+    } else if (kind === 'go') {
       const sv = +document.getElementById('seed').value;
-      UI.sound = document.getElementById('opt-sound').checked;
-      startShift(startDiff, sv > 0 ? Math.floor(sv) : undefined);
+      const snd = document.getElementById('opt-sound'); if (snd) UI.sound = snd.checked;
+      const cfg = Object.assign({}, startCfg, { label: startPreset === 'custom' ? 'Custom (' + difficultyOf(startCfg) + ')' : PR[startPreset].label, base: difficultyOf(startCfg) === 'Easy' ? 'trainee' : difficultyOf(startCfg) === 'Normal' ? 'operator' : 'senior' });
+      startShift(cfg, sv > 0 ? Math.floor(sv) : undefined, startPreset);
     }
+  }
+  function onStartInput(ev) {
+    const t = ev.target;
+    const f = t.getAttribute && t.getAttribute('data-sf');
+    if (!f) return;
+    startCfg[f] = t.type === 'checkbox' ? t.checked : +t.value;
+    startPreset = 'custom';
+    if (t.type === 'range') { const row = t.closest('.setrow'); const sp = row && row.querySelector('span'); if (sp) sp.textContent = f === 'trucks' ? startCfg.trucks + ' trucks across the shift.' : startCfg.permits + ' contractor jobs needing your signature.'; document.querySelectorAll('.preset').forEach((b) => b.classList.toggle('on', b.getAttribute('data-k') === 'custom')); const db = document.querySelector('.diffbadge b'); if (db) db.textContent = difficultyOf(startCfg); store('hmt-cfg', JSON.stringify({ preset: startPreset, cfg: startCfg })); }
+    else refreshSettings();
   }
 
   // ------------------------------------------------------------------ World pointer handling
@@ -601,6 +693,7 @@
     if (m(/^(car|comp)/)) return UIA.nav('rail');
     if ((r = m(/^pm(.+)/))) return UIA.nav('permits', r[1]);
     if ((r = m(/^tk(.+)/))) return UIA.nav('tanks', r[1]);
+    if ((r = m(/^ap(\d+)/))) { UI.sideMin = false; UI.sideTab = 'needs'; return UIA.apprShow(+r[1]); }
   }
   function thunder(km) {
     if (!actx || !UI.sound) return;
@@ -629,6 +722,9 @@
     document.getElementById('pausebar').addEventListener('click', onClick);
     document.getElementById('lesson').addEventListener('click', onClick);
     document.getElementById('start').addEventListener('click', onStartClick);
+    document.getElementById('start').addEventListener('change', onStartInput);
+    document.getElementById('start').addEventListener('input', (ev) => { if (ev.target.type === 'range') onStartInput(ev); });
+    document.getElementById('tutor').addEventListener('click', onClick);
     document.addEventListener('input', onInput);
     document.addEventListener('change', onInput);
     document.addEventListener('keydown', onKey);
@@ -636,7 +732,8 @@
     const release = () => setTimeout(() => { UI.pressed = null; }, 0);
     document.addEventListener('pointerup', release, true);
     document.addEventListener('pointercancel', release, true);
-    showStart();
+    // First visit: start with the guided shift. Afterwards, the settings screen.
+    if (!store('hmt-tut-seen') && W) startTutorial(); else showStart();
     requestAnimationFrame(frame);
   }
 

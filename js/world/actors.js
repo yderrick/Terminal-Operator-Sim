@@ -526,6 +526,8 @@
       }
       for (const id of S.tankOrder) { const tk = S.tanks[id]; if (tk.psvLift || tk.lshhTrip || tk.fillMeas > 0.9) add('tk' + id, '!', P1, tk.x, tk.r * 2 + 9, tk.y, tk.tag + ' alarm'); }
       if (S.rail.comp.tripped) add('comp', '!', P2, 66, 8, 124, 'C-301 tripped');
+      // Crew asking for approval: a purple question mark over the place the decision is about.
+      for (const ap of S.approvals || []) if (ap.loc) add('ap' + ap.id, '?', '#7a4fc0', ap.loc.x, 13, ap.loc.z, 'Crew ask: ' + ap.title + ' (click to answer)');
       const seen = new Set();
       for (const w of want) {
         seen.add(w.key);
