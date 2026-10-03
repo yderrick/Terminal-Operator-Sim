@@ -360,6 +360,9 @@
     sideTab(t) { UI.sideTab = t; UI.sideMin = false; },
     tutNext() { L.tutor.next(); },
     tutBack() { L.tutor.back(); },
+    tutClose() { L.tutor.close(); },
+    tutMin() { L.tutor.minimise(); },
+    tutShow() { L.tutor.show(); },
     tutHold() { L.tutor.T.hold = !L.tutor.T.hold; if (!L.tutor.T.hold) UI.tutorHold = false; },
     tutFollow() { L.tutor.T.follow = !L.tutor.T.follow; },
     tutTakeover() { UI.modal = { type: 'takeover' }; },
@@ -495,6 +498,7 @@
     if (ev.key === ' ') { ev.preventDefault(); UIA.pause(); renderAll(); }
     else if (/^[1-5]$/.test(ev.key)) { UIA.speed(SPEEDS[+ev.key - 1]); renderAll(); }
     else if (ev.key === 'Escape' && UI.modal && UI.modal.type !== 'report') { UI.modal = null; renderAll(); }
+    else if (ev.key === 'Escape' && L.tutor && L.tutor.T.active && L.tutor.T.cur && !L.tutor.T.min) { L.tutor.close(); renderAll(); }
     else if (ev.key === 'Escape') { UIA.deselect(); if (UI.tab !== 'site' && W) UI.tab = 'site'; renderAll(); }
   }
 

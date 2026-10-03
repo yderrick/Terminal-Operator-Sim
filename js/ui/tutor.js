@@ -18,14 +18,14 @@
   // Keys that always deserve a full card, however often they happen.
   const ALWAYS = /^(gate-reject|decant|hold:|permit-reject|permit-simops|permit-issue|radar|rail-reject|gas-|fire-|esd-reset|lightning|ask|comp-high|alarm:|lesson:|wbzero|odor)/;
 
-  const T = { active: false, intro: -1, queue: [], cur: null, curStart: 0, curDur: 8, lastNarr: 0, lastLog: 0, seen: {}, follow: true, hold: true, ticker: [], held: false };
+  const T = { active: false, intro: -1, queue: [], cur: null, curStart: 0, curDur: 8, lastNarr: 0, lastLog: 0, seen: {}, follow: true, hold: true, ticker: [], held: false, min: false, pos: null, unseen: 0 };
 
   function begin(S) {
-    Object.assign(T, { active: true, intro: 0, queue: [], cur: null, lastNarr: S.narrSeq, lastLog: S.logSeq, seen: {}, ticker: [], held: false });
+    Object.assign(T, { active: true, intro: 0, queue: [], cur: null, lastNarr: S.narrSeq, lastLog: S.logSeq, seen: {}, ticker: [], held: false, min: false, unseen: 0 });
     UI.tutorHold = true;
     showIntro();
   }
-  function end() { T.active = false; T.cur = null; T.queue = []; UI.tutorHold = false; const el = document.getElementById('tutor'); if (el) { el.hidden = true; el.innerHTML = ''; } }
+  function end() { T.active = false; T.cur = null; T.queue = []; UI.tutorHold = false; const el = document.getElementById('tutor'); if (el) { el.hidden = true; el.innerHTML = ''; el._html = null; } }
 
   function camTo(c) {
     const W = L.app.W;
@@ -84,21 +84,25 @@
     if (T.intro >= 0) return;
     collect(S);
     const now = performance.now();
-    if (T.cur && now - T.curStart > T.curDur * 1000) next();
-    if (!T.cur && T.queue.length) {
-      T.cur = T.queue.shift();
-      T.curStart = now;
-      const words = (T.cur.title + ' ' + (T.cur.why || '')).split(/\s+/).length;
-      T.curDur = U.clamp(words / 3.3, 6, 18);
-      const W = L.app.W;
-      if (T.follow && W && T.cur.loc) {
-        W.camCtl.follow = null;
-        W.camCtl.focus(T.cur.loc.x, T.cur.loc.z, 72);
-        if (T.cur.loc.kind && T.cur.loc.kind !== 'ground') W.sel = { kind: T.cur.loc.kind, id: T.cur.loc.id, key: T.cur.loc.key || null, pos: { x: T.cur.loc.x, z: T.cur.loc.z } };
-      }
-    }
-    UI.tutorHold = T.hold && !!T.cur;
+    if (T.cur && !T.min && now - T.curStart > T.curDur * 1000) next();
+    // Cards wait while the card is minimised or the player is reading a console page or dialog.
+    const busy = T.min || (L.app.W && UI.tab !== 'site') || !!UI.modal;
+    if (!T.cur && T.queue.length && !busy) pop(now);
+    T.unseen = T.queue.length;
+    UI.tutorHold = T.hold && !!T.cur && !T.min;
     render();
+  }
+  function pop(now) {
+    T.cur = T.queue.shift();
+    T.curStart = now;
+    const words = (T.cur.title + ' ' + (T.cur.why || '')).split(/\s+/).length;
+    T.curDur = U.clamp(words / 3.3, 6, 18);
+    const W = L.app.W;
+    if (T.follow && W && T.cur.loc) {
+      W.camCtl.follow = null;
+      W.camCtl.focus(T.cur.loc.x, T.cur.loc.z, 72);
+      if (T.cur.loc.kind && T.cur.loc.kind !== 'ground') W.sel = { kind: T.cur.loc.kind, id: T.cur.loc.id, key: T.cur.loc.key || null, pos: { x: T.cur.loc.x, z: T.cur.loc.z } };
+    }
   }
   function next() {
     if (T.intro >= 0) {
@@ -112,36 +116,99 @@
     render();
   }
   function back() { if (T.intro > 0) { T.intro--; showIntro(); } }
+  // Close this card. Anything already queued goes to the ticker; the next new event pops up again.
+  function close() {
+    if (T.intro >= 0) { T.intro = -1; T.cur = null; UI.tutorHold = false; render(); return; }
+    const S = L.app.S;
+    for (const q of T.queue) ticker(S, q.title, q.t);
+    T.queue = []; T.cur = null; UI.tutorHold = false;
+    render();
+  }
+  // Minimise to a small bar: cards keep collecting quietly until the player opens it again.
+  function minimise() {
+    if (T.intro >= 0) { T.intro = -1; T.cur = null; }
+    else if (T.cur) { T.queue.unshift(T.cur); T.cur = null; }
+    T.min = true; UI.tutorHold = false;
+    render();
+  }
+  function show() { T.min = false; if (!T.cur && T.queue.length) pop(performance.now()); UI.tutorHold = T.hold && !!T.cur; render(); }
+
+  // Drag the card by its header. The outer #tutor element is never rebuilt, so it holds the position.
+  let dragInit = false;
+  function initDrag(el) {
+    if (dragInit) return;
+    dragInit = true;
+    let d = null;
+    el.addEventListener('pointerdown', (ev) => {
+      const h = ev.target.closest('[data-drag]');
+      if (!h || ev.target.closest('button,input,label') || ev.button !== 0) return;
+      const r = el.getBoundingClientRect();
+      d = { dx: ev.clientX - r.left, dy: ev.clientY - r.top, w: r.width, id: ev.pointerId };
+      el.setPointerCapture(ev.pointerId);
+      el.classList.add('dragging');
+      ev.preventDefault();
+    });
+    el.addEventListener('pointermove', (ev) => {
+      if (!d || ev.pointerId !== d.id) return;
+      T.pos = { x: ev.clientX - d.dx, y: ev.clientY - d.dy, w: d.w };
+      place(el);
+    });
+    const up = (ev) => { if (d && ev.pointerId === d.id) { d = null; el.classList.remove('dragging'); } };
+    el.addEventListener('pointerup', up);
+    el.addEventListener('pointercancel', up);
+    el.addEventListener('dblclick', (ev) => { if (ev.target.closest('[data-drag]') && !ev.target.closest('button')) { T.pos = null; place(el); } });
+    window.addEventListener('resize', () => place(el));
+  }
+  function place(el) {
+    if (!T.pos) { el.style.left = el.style.top = el.style.bottom = el.style.right = el.style.width = el.style.transform = ''; return; }
+    const w = Math.min(T.pos.w, window.innerWidth - 16), h = el.offsetHeight || 120;
+    const x = U.clamp(T.pos.x, 8, Math.max(8, window.innerWidth - w - 8)), y = U.clamp(T.pos.y, 8, Math.max(8, window.innerHeight - Math.min(h, 80) - 8));
+    Object.assign(el.style, { left: x + 'px', top: y + 'px', bottom: 'auto', right: 'auto', width: el.classList.contains('compact') ? '' : w + 'px', transform: 'none' });
+  }
 
   function render() {
     const el = document.getElementById('tutor');
     if (!el) return;
     if (!T.active) { el.hidden = true; return; }
+    initDrag(el);
     const S = L.app.S;
     el.hidden = false;
     const c = T.cur;
-    let h = '<div class="tut-in">';
-    if (c) {
-      const el2 = c.intro ? 'Tour ' + (T.intro + 1) + ' of ' + INTRO.length : (S ? U.clock(S, c.t) + ' · ' : '') + e(c.eyebrow || '');
-      h += '<div class="tut-eyebrow">' + (c.decision ? '<span class="pill p4">Decision</span> ' : '') + el2 + '</div><h3>' + e(c.title) + '</h3><p>' + e(c.why || '') + '</p>';
-      if (!c.intro) h += '<div class="tut-bar"><i></i></div>';
+    let h;
+    if (T.min || !c) {
+      // Compact bar: the crew carry on; open it for the latest events and controls.
+      const waiting = T.queue.length;
+      const last = T.ticker[0];
+      h = '<div class="tut-in tut-bar-min' + (waiting ? ' has-new' : '') + '"><div class="tut-head" data-drag title="Drag to move · double-click to reset"><span class="tut-grip" aria-hidden="true">⠿</span><span class="tut-eyebrow">Guided shift' + (S ? ' · ' + U.clock(S) : '') + '</span>';
+      if (T.min) h += '<button type="button" class="btn sm" data-a="ui:tutShow">' + (waiting ? waiting + ' new card' + (waiting > 1 ? 's' : '') + ' ▴' : 'Show cards ▴') + '</button>';
+      else h += '<span class="tut-idle">' + (last ? (S ? U.clock(S, last.t) + ' ' : '') + e(last.text) : 'The crew are working. The next decision pops up here.') + '</span><button type="button" class="tut-x" data-a="ui:tutMin" title="Minimise: cards wait until you open them" aria-label="Minimise">▾</button>';
+      h += '</div>';
+      if (!T.min) h += '<div class="tut-btns"><label class="chk"><input type="checkbox" id="tut-hold"' + (T.hold ? ' checked' : '') + ' data-a="ui:tutHold"> Pause on each card</label><label class="chk"><input type="checkbox" id="tut-follow"' + (T.follow ? ' checked' : '') + ' data-a="ui:tutFollow"> Camera follows</label><span class="tut-sp"></span><button type="button" class="btn sm ghost" data-a="ui:tutTakeover">Take over…</button><button type="button" class="btn sm quiet" data-a="ui:tutExit">Exit tutorial</button></div>';
+      h += '</div>';
     } else {
-      h += '<div class="tut-eyebrow">Guided shift' + (S ? ' · ' + U.clock(S) : '') + '</div><p class="tut-idle">The crew are working. The next decision will appear here.</p>';
+      h = '<div class="tut-in">';
+      const el2 = c.intro ? 'Tour ' + (T.intro + 1) + ' of ' + INTRO.length : (S ? U.clock(S, c.t) + ' · ' : '') + e(c.eyebrow || '');
+      h += '<div class="tut-head" data-drag title="Drag to move · double-click to reset"><span class="tut-grip" aria-hidden="true">⠿</span><div class="tut-eyebrow">' + (c.decision ? '<span class="pill p4">Decision</span> ' : '') + el2 + (T.queue.length ? ' <span class="tut-more">+' + T.queue.length + ' more</span>' : '') + '</div>';
+      h += '<button type="button" class="tut-x" data-a="ui:tutMin" title="Minimise: cards wait until you open them" aria-label="Minimise">▾</button><button type="button" class="tut-x" data-a="ui:tutClose" title="' + (c.intro ? 'Skip the tour' : 'Close this card (the next one pops up when it happens)') + '" aria-label="Close">×</button></div>';
+      h += '<h3>' + e(c.title) + '</h3><p>' + e(c.why || '') + '</p>';
+      if (!c.intro) h += '<div class="tut-bar"><i></i></div>';
+      if (T.ticker.length && T.intro < 0) h += '<div class="tut-tick"><b>Meanwhile</b>' + T.ticker.map((x) => '<div><span>' + (S ? U.clock(S, x.t) : '') + '</span> ' + e(x.text) + '</div>').join('') + '</div>';
+      h += '<div class="tut-btns">';
+      if (T.intro > 0) h += '<button type="button" class="btn sm quiet" data-a="ui:tutBack">‹ Back</button>';
+      h += '<button type="button" class="btn sm" data-a="ui:tutNext">' + (T.intro === INTRO.length - 1 ? 'Start the shift' : 'Next ›') + '</button>';
+      if (T.intro < 0) {
+        h += '<label class="chk"><input type="checkbox" id="tut-hold"' + (T.hold ? ' checked' : '') + ' data-a="ui:tutHold"> Pause on each card</label>';
+        h += '<label class="chk"><input type="checkbox" id="tut-follow"' + (T.follow ? ' checked' : '') + ' data-a="ui:tutFollow"> Camera follows</label>';
+      }
+      h += '<span class="tut-sp"></span><button type="button" class="btn sm ghost" data-a="ui:tutTakeover">Take over…</button><button type="button" class="btn sm quiet" data-a="ui:tutExit">Exit tutorial</button></div></div>';
     }
-    if (T.ticker.length && T.intro < 0) h += '<div class="tut-tick"><b>Meanwhile</b>' + T.ticker.map((x) => '<div><span>' + (S ? U.clock(S, x.t) : '') + '</span> ' + e(x.text) + '</div>').join('') + '</div>';
-    h += '<div class="tut-btns">';
-    if (T.intro > 0) h += '<button type="button" class="btn sm quiet" data-a="ui:tutBack">‹ Back</button>';
-    if (c) h += '<button type="button" class="btn sm" data-a="ui:tutNext">' + (T.intro === INTRO.length - 1 ? 'Start the shift' : 'Next ›') + '</button>';
-    if (T.intro < 0) {
-      h += '<label class="chk"><input type="checkbox" id="tut-hold"' + (T.hold ? ' checked' : '') + ' data-a="ui:tutHold"> Pause on each card</label>';
-      h += '<label class="chk"><input type="checkbox" id="tut-follow"' + (T.follow ? ' checked' : '') + ' data-a="ui:tutFollow"> Camera follows</label>';
-    }
-    h += '<span class="tut-sp"></span><button type="button" class="btn sm ghost" data-a="ui:tutTakeover">Take over</button><button type="button" class="btn sm quiet" data-a="ui:tutExit">Exit tutorial</button></div></div>';
+    el.classList.toggle('compact', T.min || !c);
     L.ui.setHTML(el, h);
+    place(el);
     // The countdown bar moves every frame; set it directly so the card's buttons are not rebuilt.
     const bar = el.querySelector('.tut-bar i');
     if (bar && c && !c.intro) bar.style.width = (Math.min(1, (performance.now() - T.curStart) / (T.curDur * 1000)) * 100).toFixed(1) + '%';
   }
 
-  L.tutor = { T, begin, end, frame, next, back, render, INTRO };
+  L.tutor = { T, begin, end, frame, next, back, close, minimise, show, render, INTRO };
 })(globalThis.LPG = globalThis.LPG || {});

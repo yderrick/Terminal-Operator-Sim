@@ -471,6 +471,21 @@ body.no-world .viewbar, body.no-world .minimap { display: none; }
 .tut-btns { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 2px; }
 .tut-btns label.chk { font-size: 12.5px; align-items: center; }
 .tut-sp { flex: 1; }
+.tut-head { display: flex; align-items: center; gap: 6px; cursor: grab; touch-action: none; user-select: none; margin: -4px -6px 0 -4px; }
+.tutor.dragging .tut-head { cursor: grabbing; }
+.tut-head .tut-eyebrow { flex: 1; min-width: 0; }
+.tut-grip { color: var(--ink-3); font-size: 14px; line-height: 1; padding: 2px; }
+.tut-x { border: 1px solid transparent; background: none; color: var(--ink-2); font-size: 16px; line-height: 1; width: 28px; height: 26px; border-radius: var(--r); cursor: pointer; flex: none; }
+.tut-x:hover { background: var(--panel-2); border-color: var(--line); color: var(--ink); }
+.tut-more { color: var(--ink-3); font-family: var(--f-data); letter-spacing: 0; text-transform: none; }
+.tutor.compact { width: min(520px, calc(100% - 32px)); }
+.tutor.compact .tut-in { padding: 6px 10px; gap: 4px; border-top-width: 3px; }
+.tutor.compact .tut-head { margin: 0; }
+.tutor.compact .tut-head .tut-eyebrow { flex: none; }
+.tutor.compact .tut-idle { flex: 1; min-width: 0; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tutor.compact .tut-head .btn { margin-left: auto; }
+.tut-bar-min.has-new { border-color: var(--p4); }
+.tutor.dragging .tut-in { box-shadow: 0 20px 50px rgba(0,0,0,.4); }
 body.tutorial .lesson, body.tutorial #pausebar { display: none; }
 body.tutorial .minimap { display: none; }
 body.tutorial .inspector { bottom: auto; top: calc(var(--top-h) + 10px); max-height: calc(100% - var(--top-h) - var(--alarm-h) - 260px); overflow-y: auto; }
