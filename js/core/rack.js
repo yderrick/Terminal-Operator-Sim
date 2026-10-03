@@ -255,7 +255,8 @@
         // Truck tank thermal & relief (fire exposure or liquid-full).
         if (tr.pos && tr.content > 0) {
           const prod = tr.product;
-          const del = tr.bay && tr.state === 'AT_BAY' ? Math.max(L.plant.delugeEff(S, 'DV301'), S.fireBrigade.onScene ? 0.6 : 0) : 0;
+          const fbt = S.fireBrigade.target;
+          const del = tr.bay && tr.state === 'AT_BAY' ? Math.max(L.plant.delugeEff(S, 'DV301'), S.fireBrigade.onScene ? (!fbt ? 0.5 : fbt === 'LR' ? 0.8 : 0.15) : 0) : 0;
           if (tr.fireQ > 0) {
             tr.wallT += 1.6 * Math.min(1.5, tr.fireQ / 2.5e6) * (1 - 0.9 * del) * dt;
             tr.Tl += tr.fireQ * (1 - 0.8 * del) * dt / (Math.max(tr.content, 2000) * 2500 * 0.5);

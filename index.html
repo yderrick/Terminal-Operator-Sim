@@ -12,19 +12,27 @@
 </head>
 <body>
 <div id="app">
+  <div id="world" class="world" aria-label="Terminal site in 3D"></div>
   <header class="top" id="top"></header>
-  <div class="body">
-    <nav class="nav" id="nav" aria-label="Console pages"></nav>
+  <nav class="nav" id="nav" aria-label="Console pages"></nav>
+  <aside class="needs" id="side" aria-label="Decisions waiting and radio"></aside>
+  <div class="viewbar" id="viewbar" aria-label="View controls"></div>
+  <div class="minimap" id="minimap" aria-label="Site map — click to move the camera"></div>
+  <div class="inspector" id="inspector" hidden></div>
+  <section class="drawer" id="drawer" hidden>
+    <div class="drawer-h"><h2 id="drawer-title"></h2><button type="button" class="x" data-a="ui:closeDrawer" aria-label="Close page">×</button></div>
     <main class="main" id="main"></main>
-    <aside class="side" id="side" aria-label="Attention queue and radio"></aside>
-  </div>
+  </section>
   <section class="alarms" id="alarms" aria-label="Alarm summary"></section>
 </div>
+<div id="tip" class="tip" hidden></div>
+<div id="ctx" class="ctx" hidden></div>
 <div id="toasts" class="toasts" aria-live="polite"></div>
 <div id="pausebar"></div>
 <div id="lesson"></div>
 <div id="modal"></div>
 <div id="start" class="start"></div>
+<script src="vendor/three.min.js"></script>
 <script src="js/core/util.js"></script>
 <script src="js/core/physics.js"></script>
 <script src="js/core/data.js"></script>
@@ -37,10 +45,17 @@
 <script src="js/core/permits.js"></script>
 <script src="js/core/events.js"></script>
 <script src="js/core/report.js"></script>
+<script src="js/core/autopilot.js"></script>
+<script src="js/world/kit.js"></script>
+<script src="js/world/site.js"></script>
+<script src="js/world/camera.js"></script>
+<script src="js/world/actors.js"></script>
+<script src="js/world/world.js"></script>
 <script src="js/ui/dom.js"></script>
 <script src="js/ui/svg.js"></script>
 <script src="js/ui/views-ops.js"></script>
 <script src="js/ui/views-safety.js"></script>
+<script src="js/ui/hud.js"></script>
 <script src="js/ui/app.js"></script>
 </body>
 </html>

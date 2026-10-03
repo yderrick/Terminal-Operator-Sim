@@ -1,8 +1,17 @@
 # Harrowmere LPG Terminal
 
-A browser game where you run the control room of a pressurised LPG terminal for a twelve-hour day shift. Road tankers queue at the gate, rail cars of propane wait to be unloaded, contractors want permits, the sun warms the spheres, and things go wrong. You are scored on **safety**, **throughput** and **compliance**.
+A browser game where you run a pressurised LPG terminal for a twelve-hour day shift — in 3D. Road tankers queue at the gate, rail cars of propane are shunted in, contractors want permits, field operators walk the plant, the sun warms the spheres, and things go wrong. You are scored on **safety**, **throughput** and **compliance**.
 
-Open `index.html` in a browser. No install, no server, no build step needed to play. `dist/harrowmere-standalone.html` is the same game as one self-contained file.
+Open `index.html` in a browser. No install, no server, no build step needed to play (Three.js is vendored in `vendor/`). `dist/harrowmere-standalone.html` is the same game as one self-contained file that works offline.
+
+## The site
+
+The whole terminal is a live 3D model driven by the simulation: spheres with stair towers and deluge rings, pumps whose fans spin when they run, loading arms that swing onto the tankers, a gate barrier, weighbridges, a rail siding with a shunting locomotive, buildings, light masts, a windsock that follows the real wind, and gas detectors whose LEDs change colour with the reading.
+
+- **People.** Field operators, tanker drivers working through their pre-load checks, the gate guard, contractors welding or digging on permits, fitters, instrument and lab technicians, the rail shunter and, if it comes to it, firefighters with hoses. Hover anyone to see what they are doing.
+- **Commands.** Select a field operator, then click a target: a sphere (read the local level gauge, investigate), a rail car (secure, sample, connect, close valves, release), a detector, the odorant skid, the fire pumps, a contractor's work site (gas test, verify isolation) or open ground (walk here, investigate, start rounds). Select a driver to use the bay PA or stop loading; a contractor to suspend or close their permit; the fire service to choose what they cool.
+- **Views.** Underground shows the buried fire-water ring main, the rail unloading line, cable trenches, drains and the sphere piles. Levels is an X-ray of the liquid in spheres, tankers and rail cars. Labels toggles tags and live readings. Day turns to dusk, storms bring rain and lightning, and gas clouds, jet fires, deluge water and relief-valve vapour are drawn where the simulation puts them.
+- **Controls.** Drag to pan, right-drag or two fingers to rotate and tilt, scroll or pinch to zoom, WASD/QE/RF on a keyboard, double-click to fly somewhere. The minimap moves the camera. Console pages slide in from the menu on the left, and every item in **Needs you** flies the camera to the problem.
 
 ## What you do
 
@@ -38,8 +47,10 @@ All people, companies and the terminal are fictional.
 ```
 index.html              page that loads the scripts below (generated)
 css/hmi.css             ISA-101 style console, light and dark themes
-js/core/                simulation, no DOM: physics, plant, rack, rail, crew, permits, events, scoring, handbook
-js/ui/                  rendering and interaction
+js/core/                simulation, no DOM: physics, plant, rack, rail, crew, permits, events, scoring, handbook, autopilot
+js/world/               3D site (Three.js r128): model kit, static plant, camera, live actors and effects, picking
+js/ui/                  HUD, console pages, inspector and orders
+vendor/three.min.js     Three.js r128 (MIT) for offline play; the published build loads it from cdnjs
 tools/build.js          writes index.html and the single-file builds in dist/
 tests/                  headless shifts played by scripted operators
 ```

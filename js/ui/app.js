@@ -6,10 +6,12 @@
   const F = U.fmt;
   const V = L.views;
   let S = null;
+  let W = null; // 3D world, null when WebGL is unavailable
+  let preview = null;
   const $ = (id) => document.getElementById(id);
 
-  const TABS = [
-    ['overview', 'Overview'], ['tanks', 'Tank farm'], ['rack', 'Loading rack'], ['gate', 'Gate & weighbridge'], ['rail', 'Rail'],
+  let TABS = [
+    ['site', 'Site (3D)'], ['overview', 'Schematic'], ['tanks', 'Tank farm'], ['rack', 'Loading rack'], ['gate', 'Gate & weighbridge'], ['rail', 'Rail'],
     ['utilities', 'Pumps & utilities'], ['fg', 'Fire & gas'], ['permits', 'Permits'], ['crew', 'Crew & tasks'], ['log', 'Shift log'], ['handbook', 'Handbook'],
   ];
   const SPEEDS = [15, 30, 60, 120, 240];
@@ -19,42 +21,45 @@
   // ------------------------------------------------------------------ Attention queue
   function attention(S) {
     const out = [];
-    const add = (pri, text, sub, tab, sel) => out.push({ pri, text, sub, tab, sel });
-    if (!S.handover.acked) add(3, 'Read and sign the handover', 'Night shift notes', 'crew');
+    const add = (pri, text, sub, tab, sel, loc) => out.push({ pri, text, sub, tab, sel, loc });
+    const at = (x, z, kind, id, key) => ({ x, z, kind, id, key });
+    if (!S.handover.acked) add(3, 'Read and sign the handover', 'Night shift notes', 'crew', undefined, at(150, 151, 'ccr', 'CCR'));
     if (S.weather.hold && S.bays.some((b) => b.state === 'LOADING') ) add(1, 'Lightning inside 10 km — stop transfers', 'Bays still loading', 'rack');
     if (S.weather.hold && S.rail.comp.running) add(1, 'Lightning inside 10 km — stop C-301', 'Rail unloading running', 'rail');
-    for (const tr of S.trucks.filter((t) => t.state === 'QUEUE')) add(S.t - tr.queueT > 1800 ? 2 : 3, tr.plate + ' at the gate', tr.product + (tr.booked ? '' : ' · unbooked') + ' · ' + U.dur(S.t - tr.queueT), 'gate', ['truck', tr.id]);
+    for (const tr of S.trucks.filter((t) => t.state === 'QUEUE')) add(S.t - tr.queueT > 1800 ? 2 : 3, tr.plate + ' at the gate', tr.product + (tr.booked ? '' : ' · unbooked') + ' · ' + U.dur(S.t - tr.queueT), 'gate', ['truck', tr.id], at(278, 162, 'truck', tr.id, 'trk:' + tr.id));
     for (const b of S.bays) {
       const tr = b.truckId && S.trucks.find((x) => x.id === b.truckId);
-      if (b.hold) add(2, b.tag + ': ' + (b.hold.key === 'ground' ? 'ground permissive' : b.hold.key === 'leak' ? 'leak test failed' : 'driver behaviour'), tr ? tr.plate : '', 'rack', b.id);
-      else if (b.state === 'READY') add(3, b.tag + ' ready — set preset', tr ? tr.plate : '', 'rack', b.id);
-      else if (b.state === 'STOPPED') add(2, b.tag + ' stopped', b.stopReason, 'rack', b.id);
-      else if (b.state === 'LOADING' && !b.flowing && (b.noFlowT || 0) > 60) add(2, b.tag + ' authorised but no flow', 'Check header line-up and pumps', 'utilities');
-      if (tr && tr.engineOn) add(1, b.tag + ': engine running while connected', tr.plate, 'rack', b.id);
+      const bl = at(b.x, 78, 'bay', b.id);
+      if (b.hold) add(2, b.tag + ': ' + (b.hold.key === 'ground' ? 'ground permissive' : b.hold.key === 'leak' ? 'leak test failed' : 'driver behaviour'), tr ? tr.plate : '', 'rack', b.id, bl);
+      else if (b.state === 'READY') add(3, b.tag + ' ready — set preset', tr ? tr.plate : '', 'rack', b.id, bl);
+      else if (b.state === 'STOPPED') add(2, b.tag + ' stopped', b.stopReason, 'rack', b.id, bl);
+      else if (b.state === 'LOADING' && !b.flowing && (b.noFlowT || 0) > 60) add(2, b.tag + ' authorised but no flow', 'Check header line-up and pumps', 'utilities', undefined, at(78, 76, 'pump', 'P201A'));
+      if (tr && tr.engineOn) add(1, b.tag + ': engine running while connected', tr.plate, 'rack', b.id, at(b.x, 78, 'driver', tr.id, 'trk:' + tr.id));
     }
     const parked = S.trucks.filter((t) => t.state === 'PARKED' || t.state === 'DECANT_WAIT');
     const freeBay = (p) => S.bays.some((b) => b.state === 'IDLE' && !b.truckId && !b.suspended && !b.damaged && b.product === p);
-    for (const tr of parked) if (freeBay(tr.product)) { add(3, 'Call ' + tr.plate + ' to a ' + tr.product + ' bay', tr.state === 'DECANT_WAIT' ? 'to decant' : 'waiting ' + U.dur(S.t - tr.parkedT), 'gate'); break; }
-    for (const tr of S.trucks.filter((t) => t.state === 'WEIGHED')) add(3, 'Release ' + tr.plate, 'weighed out ' + F.t(tr.wbNet), 'gate');
+    for (const tr of parked) if (freeBay(tr.product)) { add(3, 'Call ' + tr.plate + ' to a ' + tr.product + ' bay', tr.state === 'DECANT_WAIT' ? 'to decant' : 'waiting ' + U.dur(S.t - tr.parkedT), 'gate', undefined, at(279, 80, 'truck', tr.id, 'trk:' + tr.id)); break; }
+    for (const tr of S.trucks.filter((t) => t.state === 'WEIGHED')) add(3, 'Release ' + tr.plate, 'weighed out ' + F.t(tr.wbNet), 'gate', undefined, at(218, 162, 'truck', tr.id, 'trk:' + tr.id));
     for (const pm of S.permits) {
-      if (pm.status === 'pending') add(S.t - pm.requestT > 900 ? 3 : 4, 'Permit ' + pm.no + ' waiting', pm.title, 'permits', pm.no);
-      if (pm.status === 'workdone') add(4, 'Close ' + pm.no, 'work complete', 'permits', pm.no);
+      if (pm.status === 'pending') add(S.t - pm.requestT > 900 ? 3 : 4, 'Permit ' + pm.no + ' waiting', pm.title, 'permits', pm.no, at(157, 158, 'permit', pm.no, 'pm:' + pm.no + ':a'));
+      if (pm.status === 'workdone') add(4, 'Close ' + pm.no, 'work complete', 'permits', pm.no, at(pm.loc.x, pm.loc.y, 'permit', pm.no, 'pm:' + pm.no + ':a'));
     }
     for (const c of S.rail.cars) {
-      if (c.state === 'SPOTTED' && !c.secured && !c.busy) add(3, 'Rail car at ' + c.spotId + ' to secure', c.number, 'rail');
-      if (c.sample && c.sample.status === 'done' && !c.sample.pass && !c.rejected && c.received < 500) add(2, 'Car ' + c.spotId + ' sample OFF SPEC', 'decide before unloading', 'rail');
-      if (c.phase === 'liquid-done' && S.rail.comp.mode === 'LIQUID' && S.rail.comp.lineup === c.id) add(2, 'Car ' + c.spotId + ' liquid finished', 'switch C-301 to vapour recovery', 'rail');
-      if (S.rail.comp.running && S.rail.comp.mode === 'VAPOUR' && S.rail.comp.lineup === c.id && c.P < 1.6) add(2, 'Car ' + c.spotId + ' at ' + c.P.toFixed(1) + ' barg', 'stop vapour recovery', 'rail');
+      const cl = at(c.spotId === 'R1' ? 46 : 86, 140.5, 'car', c.id, 'car:' + c.id);
+      if (c.state === 'SPOTTED' && !c.secured && !c.busy) add(3, 'Rail car at ' + c.spotId + ' to secure', c.number, 'rail', undefined, cl);
+      if (c.sample && c.sample.status === 'done' && !c.sample.pass && !c.rejected && c.received < 500) add(2, 'Car ' + c.spotId + ' sample OFF SPEC', 'decide before unloading', 'rail', undefined, cl);
+      if (c.phase === 'liquid-done' && S.rail.comp.mode === 'LIQUID' && S.rail.comp.lineup === c.id) add(2, 'Car ' + c.spotId + ' liquid finished', 'switch C-301 to vapour recovery', 'rail', undefined, cl);
+      if (S.rail.comp.running && S.rail.comp.mode === 'VAPOUR' && S.rail.comp.lineup === c.id && c.P < 1.6) add(2, 'Car ' + c.spotId + ' at ' + c.P.toFixed(1) + ' barg', 'stop vapour recovery', 'rail', undefined, cl);
     }
-    if (S.rail.comp.tripped) add(2, 'C-301 tripped', S.rail.comp.tripCause, 'rail');
+    if (S.rail.comp.tripped) add(2, 'C-301 tripped', S.rail.comp.tripCause, 'rail', undefined, at(66, 124, 'comp', 'C301'));
     for (const f of S.findings) if (f.status === 'open') add(3, 'Finding: ' + f.text.split(':')[0], 'from field crew', 'crew');
-    for (const t of S.tasks) if (t.status === 'pending' && S.t >= t.startT && t.id !== 'handover') add(S.t > t.dueT - 900 ? 3 : 4, t.title, 'due ' + U.clock(S, t.dueT), t.id.includes('gauge') ? 'tanks' : t.id === 'fwtest' ? 'utilities' : t.id === 'odordel' ? 'utilities' : 'crew');
-    if (S.util.odor.failed) add(2, 'Odorant injection failed', 'propane loading unodorised', 'utilities');
-    if (S.util.ia.comps.some((c) => c.tripped)) add(2, 'Air compressor tripped', 'start the standby', 'utilities');
+    for (const t of S.tasks) if (t.status === 'pending' && S.t >= t.startT && t.id !== 'handover') add(S.t > t.dueT - 900 ? 3 : 4, t.title, 'due ' + U.clock(S, t.dueT), t.id.includes('gauge') ? 'tanks' : t.id === 'fwtest' ? 'utilities' : t.id === 'odordel' ? 'utilities' : 'crew', undefined, t.id.includes('gauge') ? at(70, 40, 'tank', 'V102') : t.id === 'fwtest' ? at(34, 121, 'fwpumps', 'FWP') : t.id === 'odordel' ? at(176, 64, 'odorant', 'T401') : undefined);
+    if (S.util.odor.failed) add(2, 'Odorant injection failed', 'propane loading unodorised', 'utilities', undefined, at(176, 64, 'odorant', 'T401'));
+    if (S.util.ia.comps.some((c) => c.tripped)) add(2, 'Air compressor tripped', 'start the standby', 'utilities', undefined, at(150, 124, 'ia', 'IA'));
     if (Object.values(S.pumps).some((p) => p.tripped && !p.loto)) add(2, 'Pump tripped', 'reset or start standby', 'utilities');
     if (S.wb.in.zero || S.wb.out.zero) add(4, 'Weighbridge off zero', 'zero check', 'gate');
     if (S.esd.site || Object.values(S.esd.zones).some((x) => x)) add(1, 'ESD active', 'reset when safe, restore line-up', 'fg');
-    if (S.fires.length) add(1, 'FIRE on site', 'deluge, isolate, muster, fire service', 'fg');
+    if (S.fires.length) add(1, 'FIRE on site', 'deluge, isolate, muster, fire service', 'fg', undefined, at(S.fires[0].x, S.fires[0].y, 'ground'));
     out.sort((a, b) => a.pri - b.pri);
     return out;
   }
@@ -87,16 +92,48 @@
     setHTML($('nav'), h);
   }
 
+  let lastAtt = [];
   function renderSide(att) {
-    let h = '<div><h3>Needs you</h3><div class="att" style="margin-top:6px">';
-    if (!att.length) h += '<p class="small muted">Nothing waiting. Watch the trends.</p>';
-    for (const a of att.slice(0, 14)) h += '<button type="button" data-a="ui:nav" data-p="' + e(JSON.stringify([a.tab, a.sel === undefined ? null : a.sel])) + '"><i class="p' + a.pri + '"></i><span>' + e(a.text) + (a.sub ? '<br><small>' + e(a.sub) + '</small>' : '') + '</span><span>›</span></button>';
-    if (att.length > 14) h += '<p class="small muted">+' + (att.length - 14) + ' more</p>';
-    h += '</div></div><div><h3>Radio & ops</h3><div class="feed" style="margin-top:6px">';
-    const feed = S.log.filter((l) => ['radio', 'rack', 'gate', 'rail', 'safety', 'ops', 'permit', 'weather'].includes(l.cat) && l.level !== 'hidden').slice(-9).reverse();
-    for (const l of feed) h += '<div class="' + (l.cat === 'radio' ? 'radio' : l.level) + '"><span class="t">' + U.clock(S, l.t) + '</span>' + e(l.text) + '</div>';
-    h += '</div></div>';
+    lastAtt = att;
+    const top = att.length ? Math.min(...att.map((a) => a.pri)) : 9;
+    let h = '<div class="needs-h"><button type="button" class="needs-tab' + (UI.sideTab !== 'radio' ? ' on' : '') + '" data-a="ui:sideTab" data-p=\'["needs"]\'>Needs you <span class="badge' + (top <= 1 ? ' p1' : top === 2 ? ' p2' : '') + '">' + att.length + '</span></button><button type="button" class="needs-tab' + (UI.sideTab === 'radio' ? ' on' : '') + '" data-a="ui:sideTab" data-p=\'["radio"]\'>Radio</button><button type="button" class="x" data-a="ui:sideMin" aria-label="' + (UI.sideMin ? 'Expand' : 'Collapse') + '">' + (UI.sideMin ? '▾' : '▴') + '</button></div>';
+    if (!UI.sideMin) {
+      if (UI.sideTab !== 'radio') {
+        h += '<div class="att" data-keep="att">';
+        if (!att.length) h += '<p class="small muted">Nothing waiting. Watch the trends.</p>';
+        att.slice(0, 12).forEach((a, i) => { h += '<button type="button" data-a="ui:need" data-p="[' + i + ']"><i class="p' + a.pri + '"></i><span>' + e(a.text) + (a.sub ? '<br><small>' + e(a.sub) + '</small>' : '') + '</span><span>' + (a.loc && W ? '⌖' : '›') + '</span></button>'; });
+        if (att.length > 12) h += '<p class="small muted">+' + (att.length - 12) + ' more</p>';
+        h += '</div>';
+      } else {
+        h += '<div class="feed" data-keep="feed">';
+        const feed = S.log.filter((l) => ['radio', 'rack', 'gate', 'rail', 'safety', 'ops', 'permit', 'weather'].includes(l.cat) && l.level !== 'hidden').slice(-14).reverse();
+        for (const l of feed) h += '<div class="' + (l.cat === 'radio' ? 'radio' : l.level) + '"><span class="t">' + U.clock(S, l.t) + '</span>' + e(l.text) + '</div>';
+        h += '</div>';
+      }
+    }
+    $('side').className = 'needs' + (UI.sideMin ? ' min' : '');
     setHTML($('side'), h);
+  }
+
+  // ------------------------------------------------------------------ World HUD
+  function renderWorldHud() {
+    const insp = $('inspector');
+    if (!W) { insp.hidden = true; return; }
+    const sel = W.sel;
+    const h = sel ? L.hud.inspector(S, sel) : (UI.selCrew ? '' : '');
+    insp.hidden = !h;
+    setHTML(insp, h);
+    let v = '';
+    const tb = (lbl, act, on, title) => '<button type="button" class="vb' + (on ? ' on' : '') + '" data-a="ui:' + act + '" title="' + e(title || lbl) + '">' + lbl + '</button>';
+    v += tb('Underground', 'vUnder', W.flags.underground, 'See buried services: fire main, rail line, cables, drains, piles');
+    v += tb('Levels', 'vXray', W.flags.xray, 'X-ray: liquid in spheres, trucks and rail cars');
+    v += tb('Labels', 'vLabels', W.flags.labels, 'Equipment tags and readings');
+    v += tb('Reset', 'vReset', false, 'Reset the camera');
+    v += tb('+', 'vZoomIn', false, 'Zoom in') + tb('−', 'vZoomOut', false, 'Zoom out');
+    v += '<span class="vb-sep"></span>';
+    for (const [k, lbl] of [['tanks', 'Spheres'], ['rack', 'Rack'], ['gate', 'Gate'], ['rail', 'Rail']]) v += tb(lbl, 'vGo', false, 'Fly to ' + lbl).replace('data-a="ui:vGo"', 'data-a="ui:vGo" data-p=\'["' + k + '"]\'');
+    setHTML($('viewbar'), v);
+    if (UI.tab === 'site' || window.innerWidth > 1180) L.hud.minimapUpdate($('minimap'), S, W.camCtl);
   }
 
   function renderAlarms() {
@@ -118,10 +155,19 @@
     h += '</div>';
     $('alarms').className = 'alarms' + (UI.alarmMin ? ' min' : '');
     setHTML($('alarms'), h);
+    // Floating panels position themselves against the real bar heights.
+    const rs = document.documentElement.style;
+    rs.setProperty('--top-h', $('top').offsetHeight + 'px');
+    rs.setProperty('--alarm-h', $('alarms').offsetHeight + 'px');
   }
 
   let mountedTab = null;
   function renderMain() {
+    const dr = $('drawer');
+    if (UI.tab === 'site') { dr.hidden = true; mountedTab = 'site'; return; }
+    dr.hidden = false;
+    const title = (TABS.find((t) => t[0] === UI.tab) || [0, ''])[1];
+    setHTML($('drawer-title'), e(title));
     const view = V[UI.tab];
     const el = $('main');
     if (mountedTab !== UI.tab) { el._html = null; view.mount(el); mountedTab = UI.tab; el.scrollTop = 0; }
@@ -217,7 +263,7 @@
 
   function renderAll() {
     const att = attention(S);
-    renderTop(); renderNav(att); renderSide(att); renderAlarms(); renderMain(); renderOverlays();
+    renderTop(); renderNav(att); renderSide(att); renderAlarms(); renderMain(); renderWorldHud(); renderOverlays();
   }
 
   // ------------------------------------------------------------------ Audio (horn)
@@ -278,9 +324,46 @@
     return out;
   }
 
+  function selectWorld(loc) {
+    if (!W || !loc) return;
+    W.camCtl.focus(loc.x, loc.z, Math.min(W.camCtl.want.dist, 85));
+    W.camCtl.follow = null;
+    if (loc.kind && loc.kind !== 'ground') {
+      W.sel = { kind: loc.kind, id: loc.id, key: loc.key || null, pos: { x: loc.x, z: loc.z } };
+      if (loc.kind !== 'crew') UI.selCrew = UI.selCrew || null;
+    }
+  }
   const UIA = {
+    need(i) {
+      const a = lastAtt[i];
+      if (!a) return;
+      if (a.loc && W) selectWorld(a.loc);
+      UIA.nav(a.tab, a.sel === undefined ? null : a.sel);
+    },
+    sideTab(t) { UI.sideTab = t; UI.sideMin = false; },
+    sideMin() { UI.sideMin = !UI.sideMin; },
+    closeDrawer() { UI.tab = W ? 'site' : 'overview'; },
+    deselect() { if (W) { W.sel = null; W.camCtl.follow = null; } UI.selCrew = null; UI.followKey = null; $('ctx').hidden = true; },
+    dropCrew() { UI.selCrew = null; },
+    follow() {
+      if (!W || !W.sel || !W.sel.key) return;
+      if (UI.followKey === W.sel.key) { UI.followKey = null; W.camCtl.follow = null; return; }
+      const key = W.sel.key; UI.followKey = key;
+      W.camCtl.follow = () => { const a = W.actors.actors.get(key); return a ? a.obj.position : null; };
+      W.camCtl.want.dist = Math.min(W.camCtl.want.dist, 70);
+    },
+    order(i) { L.hud.runOrder(S, i); },
+    ctxClose() { $('ctx').hidden = true; },
+    vUnder() { W.setUnderground(!W.flags.underground); },
+    vXray() { W.flags.xray = !W.flags.xray; },
+    vLabels() { W.flags.labels = !W.flags.labels; },
+    vReset() { W.camCtl.reset(); if (W.flags.underground) W.setUnderground(false); },
+    vZoomIn() { W.camCtl.zoom(0.7); },
+    vZoomOut() { W.camCtl.zoom(1.4); },
+    vGo(k) { const p = { tanks: [70, 44, 110], rack: [213, 80, 90], gate: [240, 150, 90], rail: [66, 132, 100] }[k]; W.camCtl.focus(p[0], p[1], p[2]); W.camCtl.follow = null; },
     nav(tab, sel) {
       if (tab.includes(':')) { const [t, s] = tab.split(':'); tab = t; sel = isNaN(+s) ? s : +s; }
+      if (tab === 'site' && !W) tab = 'overview';
       UI.tab = tab;
       if (tab === 'rack' && sel !== undefined && sel !== null) UI.sel.bay = sel;
       if (tab === 'tanks' && sel) UI.sel.tank = sel;
@@ -355,6 +438,7 @@
     let args = [];
     try { args = JSON.parse(el.getAttribute('data-p') || '[]'); } catch (err) { args = []; }
     if (a.startsWith('ui:')) {
+      if (!S && a !== 'ui:bgclose') return;
       const fn = UIA[a.slice(3)];
       if (fn) { if (a === 'ui:bgclose') fn(ev); else if (el === ev.target.closest('[data-a]')) fn.apply(null, args); }
     } else if (S && !S.over) {
@@ -378,6 +462,7 @@
     if (ev.key === ' ') { ev.preventDefault(); UIA.pause(); renderAll(); }
     else if (/^[1-5]$/.test(ev.key)) { UIA.speed(SPEEDS[+ev.key - 1]); renderAll(); }
     else if (ev.key === 'Escape' && UI.modal && UI.modal.type !== 'report') { UI.modal = null; renderAll(); }
+    else if (ev.key === 'Escape') { UIA.deselect(); if (UI.tab !== 'site' && W) UI.tab = 'site'; renderAll(); }
   }
 
   // ------------------------------------------------------------------ Loop
@@ -390,9 +475,14 @@
       if (S.pauseReq) { UI.paused = true; UI.pauseReason = S.pauseReq; S.pauseReq = null; if (UI.speed > 30) UI.speed = 30; }
       if (S.over) { UI.paused = true; UI.modal = { type: 'report' }; }
     }
+    if (W) {
+      if (S && UI.started) W.frame(S, dt, UI.paused || S.over ? 0 : UI.speed);
+      else if (preview) { if (L.autopilot && preview.t - (preview._apT || -99) > 20) { preview._apT = preview.t; L.autopilot.step(L, preview); } L.sim.tick(preview, dt * 20); W.camCtl.want.yaw += dt * 0.04; W.frame(preview, dt, 20); }
+      else W.frame(null, dt, 0);
+    }
     if (S && UI.started) {
       V.recordHistory(S);
-      if (ts - lastRender > 220) { lastRender = ts; renderAll(); }
+      if (ts - lastRender > 220) { lastRender = ts; renderAll(); if (UI.hoverPick) L.hud.tooltip(S, UI.hoverPick, UI.hoverX, UI.hoverY); }
       else if (UI.tab === 'overview' && ts - lastSvg > 120) { lastSvg = ts; L.plantSvg.update($('ov-plant'), S); }
       audioTick();
     }
@@ -403,28 +493,37 @@
   let startDiff = 'operator';
   function showStart() {
     UI.started = false; UI.paused = true;
-    const preview = L.sim.create({ seed: 4242, difficulty: 'operator' });
+    document.body.classList.add('pre');
+    preview = L.sim.create({ seed: 4242, difficulty: 'operator' });
+    if (W) { W.sel = null; W.camCtl.reset(); W.camCtl.want.dist = 175; W.camCtl.want.pitch = 0.62; }
+    // A little life in the backdrop: the autopilot runs a shift that started an hour ago.
+    if (L.autopilot) for (let i = 0; i < 180; i++) { L.autopilot.step(L, preview); L.sim.tick(preview, 20); }
     const seedVal = store('hmt-seed') || '';
     let h = '<div class="start-in"><div class="hero"><div><div class="eyebrow">HMT · day shift · 06:00–18:00</div><h1>Harrowmere LPG Terminal</h1>';
     h += '<p class="lede">Take the control room for twelve hours. Road tankers queue at the gate, rail cars of propane wait to be unloaded, contractors want permits, and the plant does what pressurised LPG does in the sun. Keep it safe, keep it moving, keep it by the book.</p></div>';
-    h += '<div class="plant-wrap" aria-hidden="true">' + L.plantSvg.build() + '</div></div>';
+    h += W ? '<div></div></div>' : '<div class="plant-wrap" aria-hidden="true">' + L.plantSvg.build() + '</div></div>';
     h += '<div><h3 style="margin-bottom:8px">Choose your shift</h3><div class="diffs">';
     const desc = { trainee: 'Fewer trucks and faults. Hints on documents, presets and weighbridge checks. Auto-pause on critical alarms.', operator: 'A normal busy day. Hints on, auto-pause on critical alarms.', senior: 'Heavy traffic, more faults and permits, no hints, no auto-pause.' };
     for (const k of ['trainee', 'operator', 'senior']) h += '<button type="button" class="diff' + (startDiff === k ? ' on' : '') + '" data-s="diff" data-k="' + k + '"><b>' + D.DIFFICULTY[k].label + '</b><span>' + desc[k] + '</span><span class="small muted">' + D.DIFFICULTY[k].trucks + ' booked trucks · ' + D.DIFFICULTY[k].permits + ' permits</span></button>';
     h += '</div></div><div class="row"><label for="seed" class="small">Seed (blank for random)</label><input id="seed" type="number" min="1" style="width:140px" value="' + e(seedVal) + '"><label class="chk"><input type="checkbox" id="opt-sound" checked> Alarm horn</label><button type="button" class="btn" data-s="go" style="font-size:16px;padding:8px 18px">Take the shift</button></div>';
-    h += '<div class="howto"><div><h4>Your desk</h4>The <b>Needs you</b> column lists every decision waiting on you. The alarm list sits along the bottom; click an alarm to read its response procedure. Speed buttons compress time: at 30× an hour passes in two minutes.</div>';
+    h += '<div class="howto"><div><h4>Your site</h4>Drag to pan, right-drag (or two fingers) to rotate, scroll or pinch to zoom. Hover anyone or anything to see what it is doing. Select a field operator, then click a sphere, rail car, skid, detector or open ground to give an order.</div><div><h4>Your desk</h4>The <b>Needs you</b> panel lists every decision waiting on you and flies the camera there. Console pages slide in from the left menu. The alarm list sits along the bottom; click an alarm for its response procedure.</div>';
     h += '<div><h4>A truck\'s journey</h4>Inspect documents at the gate → weigh in → call to a bay → driver\'s checks → you set the preset and authorise → load → weigh out → you release it, or decant it if it is over the limit.</div>';
     h += '<div><h4>Rail and spheres</h4>Secure, sample and connect rail cars, then drive the compressor: liquid first, vapour recovery after. Gauge the spheres at the start and end of shift and watch for a radar that lies.</div>';
     h += '<div><h4>When it goes wrong</h4>A detector reading means a leak upwind. Stop transfers, isolate, keep people out of the cloud, cool what is exposed. The handbook explains every rule and the accidents behind them.</div></div></div>';
     $('start').hidden = false;
+    $('start').className = 'start' + (W ? ' over-world' : '');
     $('start').innerHTML = h;
-    L.plantSvg.update($('start'), preview);
+    if (!W) L.plantSvg.update($('start'), preview);
   }
   function startShift(diff, seed) {
     if (seed) store('hmt-seed', String(seed));
     S = L.sim.create({ difficulty: diff, seed: seed || undefined });
-    UI.tab = 'overview'; UI.sel = {}; UI.hist = {}; UI.lastHist = -1e9; UI.seenToast = S.toastSeq; UI.drafts = {}; UI.modal = null; UI.pauseReason = null; UI.silencedSeq = 0;
+    preview = null;
+    if (W) { W.sel = null; W.hover = null; W.camCtl.reset(); }
+    UI.selCrew = null; UI.followKey = null; UI.sideMin = window.innerWidth < 760; UI.sideTab = 'needs';
+    UI.tab = W ? 'site' : 'overview'; UI.sel = {}; UI.hist = {}; UI.lastHist = -1e9; UI.seenToast = S.toastSeq; UI.drafts = {}; UI.modal = null; UI.pauseReason = null; UI.silencedSeq = 0;
     UI.started = true; UI.paused = false; UI.speed = 30;
+    document.body.classList.remove('pre');
     UI.alarmMin = window.innerWidth < 640;
     mountedTab = null;
     $('start').hidden = true;
@@ -446,7 +545,78 @@
     }
   }
 
+  // ------------------------------------------------------------------ World pointer handling
+  function worldInput() {
+    const cv = W.renderer.domElement;
+    let lastMove = 0, downAt = null;
+    cv.addEventListener('pointermove', (ev) => {
+      UI.hoverX = ev.clientX; UI.hoverY = ev.clientY;
+      const now = performance.now();
+      if (now - lastMove < 50 || !S || !UI.started) return;
+      lastMove = now;
+      const p = W.pick(ev.clientX, ev.clientY);
+      W.hover = p && p.kind !== 'ground' && p.kind !== 'icon' ? p : null;
+      UI.hoverPick = p && p.kind !== 'ground' ? p : null;
+      cv.style.cursor = UI.hoverPick ? 'pointer' : UI.selCrew ? 'crosshair' : 'grab';
+      L.hud.tooltip(S, UI.hoverPick, ev.clientX, ev.clientY);
+    });
+    cv.addEventListener('pointerleave', () => { $('tip').hidden = true; UI.hoverPick = null; W.hover = null; });
+    cv.addEventListener('pointerdown', (ev) => { downAt = { x: ev.clientX, y: ev.clientY, b: ev.button }; $('ctx').hidden = true; });
+    cv.addEventListener('pointerup', (ev) => {
+      if (!downAt || !S || !UI.started) return;
+      const moved = Math.hypot(ev.clientX - downAt.x, ev.clientY - downAt.y) > 6 || W.camCtl.dragged;
+      const b = downAt.b; downAt = null;
+      if (moved) return;
+      const p = W.pick(ev.clientX, ev.clientY);
+      worldClick(p, ev.clientX, ev.clientY, b);
+      renderAll();
+    });
+    cv.addEventListener('dblclick', (ev) => { const p = W.pick(ev.clientX, ev.clientY); if (p && p.point) W.camCtl.focus(p.point.x, p.point.z, Math.min(W.camCtl.want.dist, 60)); });
+    W.onThunder = (km) => thunder(km);
+  }
+  function worldClick(p, cx, cy, button) {
+    $('ctx').hidden = true;
+    if (!p) return;
+    if (p.kind === 'icon') return iconClick(p.id);
+    if (UI.selCrew && p.kind !== 'crew') { L.hud.showOrders(S, UI.selCrew, p, cx, cy); return; }
+    if (button === 2) return;
+    if (p.kind === 'ground') { UIA.deselect(); return; }
+    W.sel = { kind: p.kind, id: p.id, key: p.key, pos: p.pos ? { x: p.pos.x, z: p.pos.z } : null };
+    UI.selCrew = p.kind === 'crew' ? p.id : null;
+    if (UI.followKey && UI.followKey !== p.key) { UI.followKey = null; W.camCtl.follow = null; }
+  }
+  function iconClick(key) {
+    const m = (re) => key.match(re);
+    let r;
+    if (key === 'gate') { const q = S.trucks.find((t) => t.state === 'QUEUE'); if (q) UI.modal = { type: 'truck', id: q.id }; return; }
+    if ((r = m(/^bay(\d)/)) || (r = m(/^eng(\d)/))) return UIA.nav('rack', +r[1]);
+    if (m(/^rel/)) return UIA.nav('gate');
+    if (m(/^pl/)) return UIA.nav('utilities');
+    if (m(/^(gd|fire|inj)/)) return UIA.nav('fg');
+    if (m(/^(car|comp)/)) return UIA.nav('rail');
+    if ((r = m(/^pm(.+)/))) return UIA.nav('permits', r[1]);
+    if ((r = m(/^tk(.+)/))) return UIA.nav('tanks', r[1]);
+  }
+  function thunder(km) {
+    if (!actx || !UI.sound) return;
+    try {
+      const len = 2.4, sr = actx.sampleRate, buf = actx.createBuffer(1, sr * len, sr), d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 2);
+      const src = actx.createBufferSource(); src.buffer = buf;
+      const f = actx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 180;
+      const g = actx.createGain(); const now = actx.currentTime + Math.min(3, km / 3);
+      g.gain.setValueAtTime(0, actx.currentTime); g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(0.25 * Math.max(0.2, 1 - km / 25), now + 0.08); g.gain.exponentialRampToValueAtTime(0.0001, now + len);
+      src.connect(f); f.connect(g); g.connect(actx.destination); src.start(now);
+    } catch (err) { /* audio is optional */ }
+  }
+
   function boot() {
+    W = L.world ? L.world.init($('world')) : null;
+    if (W) { worldInput(); L.hud.minimapMount($('minimap')); L.app.world = W; }
+    else { TABS = TABS.filter((t) => t[0] !== 'site'); document.body.classList.add('no-world'); }
+    $('minimap').addEventListener('click', (ev) => { if (!W) return; const p = L.hud.minimapClick($('minimap'), ev); if (p) { W.camCtl.focus(p.x, p.z); W.camCtl.follow = null; } });
+    document.getElementById('ctx').addEventListener('click', onClick);
+    document.getElementById('inspector').addEventListener('click', onClick);
     const th = store('hmt-theme');
     if (th === 'dark' || th === 'light') document.documentElement.setAttribute('data-theme', th);
     document.getElementById('app').addEventListener('click', onClick);
@@ -461,6 +631,6 @@
     requestAnimationFrame(frame);
   }
 
-  L.app = { boot, UIA, attention, get S() { return S; } };
+  L.app = { boot, UIA, attention, get S() { return S; }, get W() { return W; } };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })(globalThis.LPG = globalThis.LPG || {});

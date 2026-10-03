@@ -31,7 +31,7 @@
   function tankDelugeEff(S, tankId) {
     const d = D.DELUGE.find((x) => x.covers === tankId);
     let e = d ? delugeEff(S, d.id) : 0;
-    if (S.fireBrigade.onScene) e = Math.max(e, 0.6);
+    if (S.fireBrigade.onScene) { const tg = S.fireBrigade.target; e = Math.max(e, !tg ? 0.5 : tg === tankId ? 0.8 : 0.15); }
     return e;
   }
   // Max %LEL at a point from all active leaks.
@@ -878,6 +878,13 @@
       for (const tr of S.trucks) tr.driverEvacuated = false;
       for (const c of S.crew) if (c.task && c.task.kind === 'muster') { c.task = null; c.state = 'idle'; }
     }
+    return { ok: true };
+  });
+  A('fireBrigadeTarget', (S, target) => {
+    const fb = S.fireBrigade;
+    if (!fb.onScene) return { ok: false, msg: 'The fire service is not on site.' };
+    fb.target = target || null;
+    sim.log(S, 'safety', 'Fire service incident commander: hose teams redirected to ' + (target ? (S.tanks[target] ? S.tanks[target].tag : target === 'LR' ? 'the loading rack' : 'the rail siding') : 'cover all exposures') + '.');
     return { ok: true };
   });
   A('callFireBrigade', (S) => {
