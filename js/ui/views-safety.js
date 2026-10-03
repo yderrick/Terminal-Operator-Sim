@@ -176,7 +176,7 @@
   V.crewLocs = LOCS;
 
   // ------------------------------------------------------------------ Logbook
-  const CATS = { all: 'All', ops: 'Operations', rack: 'Rack', gate: 'Gate', rail: 'Rail', permit: 'Permits', alarm: 'Alarms', radio: 'Radio', safety: 'Safety', weather: 'Weather', score: 'Score', note: 'My notes' };
+  const CATS = { all: 'All', crew: 'Crew', ops: 'Operations', rack: 'Rack', gate: 'Gate', rail: 'Rail', permit: 'Permits', alarm: 'Alarms', radio: 'Radio', safety: 'Safety', weather: 'Weather', score: 'Score', note: 'My notes' };
   V.log = simple((S) => {
     let h = '<div class="sec-h"><h2>Shift log</h2><span class="sub">Everything that happened, newest first</span></div><div class="card"><div class="row">';
     for (const k of Object.keys(CATS)) h += ubtn(CATS[k], 'logFilter', [k], 'sm' + (UI.logFilter === k ? '' : ' quiet'));

@@ -106,7 +106,7 @@
         if (c.injured) mode = 'lie';
         else if (c.state === 'walk' || c.state === 'retreat') mode = 'walk';
         else if (c.state === 'work') mode = { gauge: 'gauge', gastest: 'gauge', isolate: 'valve', repair: 'work', rail: 'work', odor: 'work', investigate: 'gauge', rounds: c.roundsMoving ? 'walk' : 'gauge', isolation: 'work' }[k] || 'idle';
-        add({ key: 'crew:' + c.id, role: 'operator', seed: c.id === 'FO1' ? 2 : 0, x: c.x, z: c.y, exact: true, mode, pick: { kind: 'crew', id: c.id }, badge: c.call.replace('Field ', 'F') });
+        add({ key: 'crew:' + c.id, role: 'operator', seed: c.idx * 2 + 1, x: c.x, z: c.y, exact: true, mode, pick: { kind: 'crew', id: c.id }, badge: c.call.replace('Field ', 'F') });
       }
       // Drivers at the bays
       for (const b of S.bays) {

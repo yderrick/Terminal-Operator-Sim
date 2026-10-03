@@ -12,12 +12,20 @@
   function create(opts) {
     opts = opts || {};
     const seed = (opts.seed >>> 0) || (Math.floor(Math.random() * 1e9) >>> 0);
-    const diffKey = opts.difficulty || 'operator';
+    // A config (from the settings screen) overrides the base difficulty field by field.
+    const cfg = opts.config ? Object.assign({}, L.data.PRESETS.normal, opts.config) : null;
+    const diffKey = cfg ? (cfg.base || 'operator') : (opts.difficulty || 'operator');
+    const base = L.data.DIFFICULTY[diffKey];
+    const diff = cfg ? Object.assign({}, base, L.data.FAULTS[cfg.faults] || {}, {
+      label: cfg.label || base.label, trucks: cfg.trucks, permits: cfg.permits, storm: L.data.WEATHER[cfg.weather] !== undefined ? L.data.WEATHER[cfg.weather] : base.storm,
+      hints: cfg.hints, autoPause: cfg.autoPause, unbooked: Math.max(0, Math.round(cfg.trucks / 9)),
+    }) : base;
     const today = opts.date ? new Date(opts.date) : new Date();
     today.setHours(0, 0, 0, 0);
     const S = {
       version: 1,
-      seed, rng: U.makeRng(seed), difficulty: diffKey, diff: L.data.DIFFICULTY[diffKey],
+      seed, rng: U.makeRng(seed), difficulty: cfg ? (opts.preset || 'custom') : diffKey, diff,
+      cfg: Object.assign({ crew: 2, autonomy: 'off', approvals: 'wait', rail: 2, weather: null }, cfg || {}),
       date: today.getTime(),
       startHour: opts.startHour === undefined ? 6 : opts.startHour,
       shiftLen: 12 * 3600, t: 0, over: false, endReason: null, outcome: null,
@@ -27,7 +35,8 @@
       stats: { dispatched: 0, received: 0, trucksOut: 0, trucksRejected: 0, rejectedValid: 0, turnaround: [], vented: 0, alarmsRaised: 0, ackTimes: [], unackCritSec: 0, complaints: 0, demurrageH: 0, nearMisses: 0, incidents: 0, overfills: 0, lpgDispatchedByProduct: { propane: 0, butane: 0 } },
       hornActive: false, hornPri: 4,
       flags: {},
-      settings: { autoPause: !!L.data.DIFFICULTY[diffKey].autoPause, hints: !!L.data.DIFFICULTY[diffKey].hints },
+      settings: { autoPause: !!diff.autoPause, hints: !!diff.hints },
+      approvals: [], approvalSeq: 0, narration: [], narrSeq: 0, touch: {},
     };
     for (const sys of systems) if (sys.init) sys.init(S);
     log(S, 'system', 'Shift started — ' + L.data.SITE.name + ', ' + S.diff.label + ' difficulty, seed ' + seed + '.');
@@ -66,6 +75,8 @@
     if (!fn) return { ok: false, msg: 'Unknown action ' + name };
     if (S.over) return { ok: false, msg: 'The shift has ended.' };
     const args = Array.prototype.slice.call(arguments, 2);
+    // Remember what the player did by hand so the crew does not immediately undo it.
+    if (!S._ap && S.touch) S.touch[name + ':' + JSON.stringify(args[0])] = S.t;
     let res;
     try { res = fn.apply(null, [S].concat(args)) || { ok: true }; } catch (e) {
       if (L.sim.strict) throw e;

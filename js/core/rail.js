@@ -36,7 +36,7 @@
         cars: [], spots: { R1: null, R2: null },
         comp: { tag: 'C-301', running: false, mode: 'LIQUID', lineup: null, tank: 'V102', dischT: 25, dischP: 0, suctP: 0, ko: 0, tripped: false, tripCause: '', ratio: 1 },
       };
-      const arrivals = [r.range(1.2, 2.0) * 3600, r.range(6.4, 7.6) * 3600];
+      const arrivals = [r.range(1.2, 2.0) * 3600, r.range(6.4, 7.6) * 3600].slice(0, S.cfg.rail === undefined ? 2 : S.cfg.rail);
       let n = 0;
       arrivals.forEach((at, pi) => {
         const count = pi === 0 ? 2 : r.chance(0.6) ? 2 : 1;

@@ -37,7 +37,7 @@ function monkeyBot(L, S) {
 function runShift(opts) {
   const L = load();
   L.sim.strict = opts.bot !== monkeyBot;
-  const S = L.sim.create({ seed: opts.seed, difficulty: opts.difficulty || 'operator', date: '2026-10-02' });
+  const S = opts.config ? L.sim.create({ seed: opts.seed, config: L.data.PRESETS[opts.config], preset: opts.config, date: '2026-10-02' }) : L.sim.create({ seed: opts.seed, difficulty: opts.difficulty || 'operator', date: '2026-10-02' });
   const bot = opts.bot || goodBot;
   const step = opts.step || 20;
   let checks = 0;

@@ -139,7 +139,7 @@
     hauliers: ['Northgate Haulage', 'Brenmar Gas Logistics', 'Coastline Tankers', 'Ridgeway Fuels Transport', 'Fenwick & Daughters', 'Tarn Valley Bulk', 'Orrin Road Freight'],
     customers: ['Westmoor Gas Supplies', 'Calder Heating Co-op', 'Brightwater Autogas', 'Penhallow Farm Fuels', 'Ashby Industrial Gases', 'Lowfield Catering Gas', 'Kestrel Energy Retail', 'Dunmore Rural Energy'],
     contractors: ['Stanmore Mechanical', 'Eastfield Electrical', 'Kinross Scaffolding', 'Holt Civil Works', 'Arden Inspection Services', 'Vale Instrument Services', 'Corran Painting & Coatings'],
-    crew: [{ id: 'FO1', name: 'Mira Achebe', call: 'Field 1' }, { id: 'FO2', name: 'Tomas Reilly', call: 'Field 2' }],
+    crew: [{ id: 'FO1', name: 'Mira Achebe', call: 'Field 1' }, { id: 'FO2', name: 'Tomas Reilly', call: 'Field 2' }, { id: 'FO3', name: 'Noor Haddad', call: 'Field 3' }, { id: 'FO4', name: 'Ilse Varga', call: 'Field 4' }, { id: 'FO5', name: 'Kofi Mensah', call: 'Field 5' }, { id: 'FO6', name: 'Rhian Doyle', call: 'Field 6' }],
   };
 
   const DIFFICULTY = {
@@ -148,5 +148,23 @@
     senior: { label: 'Senior operator', trucks: 23, unbooked: 3, randomEvents: 8, latent: 3, permits: 7, storm: 0.65, defectRate: 0.3, hints: false, autoPause: false, targetFrac: 0.97, faultMult: 1.5 },
   };
 
-  L.data = { SITE, ZONES, TANKS, BULLET, PUMPS, BAYS, POINTS, GAS_DET, FLAME_DET, DELUGE, ALARMS, PEOPLE, DIFFICULTY };
+  /* Shift presets for the settings screen. Every field can be changed individually.
+     autonomy: 'off' (you give every order), 'field' (crew do field work on their own),
+               'full' (crew and the CCR assistant run routine work and bring key decisions to you), 'watch' (tutorial: they do everything).
+     approvals: 'wait' (key decisions wait for you), 'timeout' (crew act on their recommendation after 10 min), 'auto'. */
+  const PRESETS = {
+    tutorial: { label: 'Guided shift', base: 'trainee', crew: 3, autonomy: 'watch', approvals: 'auto', weather: 'changeable', trucks: 13, rail: 2, faults: 'normal', permits: 4, hints: true, autoPause: false },
+    easy: { label: 'Easy', base: 'trainee', crew: 4, autonomy: 'full', approvals: 'timeout', weather: 'calm', trucks: 12, rail: 1, faults: 'few', permits: 3, hints: true, autoPause: true },
+    normal: { label: 'Normal', base: 'operator', crew: 3, autonomy: 'field', approvals: 'wait', weather: 'changeable', trucks: 17, rail: 2, faults: 'normal', permits: 5, hints: true, autoPause: true },
+    hard: { label: 'Hard', base: 'senior', crew: 2, autonomy: 'off', approvals: 'wait', weather: 'changeable', trucks: 21, rail: 2, faults: 'many', permits: 7, hints: false, autoPause: false },
+    expert: { label: 'Expert', base: 'senior', crew: 1, autonomy: 'off', approvals: 'wait', weather: 'stormy', trucks: 25, rail: 2, faults: 'many', permits: 9, hints: false, autoPause: false },
+  };
+  const FAULTS = {
+    few: { randomEvents: 2, latent: 1, defectRate: 0.14, faultMult: 0.6 },
+    normal: { randomEvents: 5, latent: 2, defectRate: 0.24, faultMult: 1 },
+    many: { randomEvents: 8, latent: 3, defectRate: 0.32, faultMult: 1.5 },
+  };
+  const WEATHER = { calm: 0, changeable: 0.45, stormy: 0.95 };
+
+  L.data = { PRESETS, FAULTS, WEATHER, SITE, ZONES, TANKS, BULLET, PUMPS, BAYS, POINTS, GAS_DET, FLAME_DET, DELUGE, ALARMS, PEOPLE, DIFFICULTY };
 })(globalThis.LPG = globalThis.LPG || {});

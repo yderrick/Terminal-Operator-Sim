@@ -433,5 +433,5 @@
     }
   }
 
-  L.permits = { TYPES, CONDITIONS, REJECT_REASONS, TEMPLATES, makePermit, assess };
+  L.permits = { TYPES, CONDITIONS, REJECT_REASONS, TEMPLATES, makePermit, assess, lessonFor };
 })(globalThis.LPG = globalThis.LPG || {});

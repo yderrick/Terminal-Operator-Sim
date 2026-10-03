@@ -117,7 +117,8 @@
       const st = (id) => S.tanks[id];
       hv.unshift({ k: 'stock', text: 'Night shift stock at 05:45 (radar): V-101 ' + (st('V101').fillMeas * 100).toFixed(1) + '%, V-102 ' + (st('V102').fillMeas * 100).toFixed(1) + '%, V-103 ' + (st('V103').fillMeas * 100).toFixed(1) + '%. Propane header on V-101, butane on V-103.' });
       const railFirst = S.rail.cars.filter((c) => c.arrivalT < 4 * 3600).length;
-      hv.push({ k: 'rail', text: railFirst + ' propane rail cars due from Saltfleet Refinery around ' + U.clock(S, S.rail.cars[0].arrivalT) + ', more after lunch. C-301 lined up to V-102. Free time 6 h per drop.' });
+      if (S.rail.cars.length) hv.push({ k: 'rail', text: railFirst + ' propane rail cars due from Saltfleet Refinery around ' + U.clock(S, S.rail.cars[0].arrivalT) + (S.rail.cars.some((c) => c.arrivalT > 5 * 3600) ? ', more after lunch' : '') + '. C-301 lined up to V-102. Free time 6 h per drop.' });
+      else hv.push({ k: 'rail', text: 'No rail deliveries today. C-301 is on standby.' });
       hv.push({ k: 'task', text: 'Weekly P-502 diesel fire pump run test is due today (30 min run, log readings).' });
       hv.push({ k: 'task', text: 'Odorant (ethyl mercaptan) top-up delivery booked for 11:00 — needs a field operator to supervise the transfer. Tank at ' + (S.util.odor.level * 100).toFixed(0) + '%.' });
       const radarEv = S.events.find((e) => e.kind === 'radar');

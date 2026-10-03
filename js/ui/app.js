@@ -110,7 +110,7 @@
         h += '</div>';
       } else {
         h += '<div class="feed" data-keep="feed">';
-        const feed = S.log.filter((l) => ['radio', 'rack', 'gate', 'rail', 'safety', 'ops', 'permit', 'weather'].includes(l.cat) && l.level !== 'hidden').slice(-14).reverse();
+        const feed = S.log.filter((l) => ['radio', 'crew', 'rack', 'gate', 'rail', 'safety', 'ops', 'permit', 'weather'].includes(l.cat) && l.level !== 'hidden').slice(-14).reverse();
         for (const l of feed) h += '<div class="' + (l.cat === 'radio' ? 'radio' : l.level) + '"><span class="t">' + U.clock(S, l.t) + '</span>' + e(l.text) + '</div>';
         h += '</div>';
       }

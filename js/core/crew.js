@@ -8,7 +8,8 @@
     name: 'crew', order: 50,
     init(S) {
       const cr = D.POINTS.control;
-      S.crew = D.PEOPLE.crew.map((c, i) => ({ id: c.id, name: c.name, call: c.call, x: cr.x - 3 + i * 6, y: cr.y - 4, state: 'idle', task: null, queue: [], injured: false, exposure: 0, backedOut: 0 }));
+      const n = U.clamp(S.cfg.crew || 2, 1, D.PEOPLE.crew.length);
+      S.crew = D.PEOPLE.crew.slice(0, n).map((c, i) => ({ id: c.id, idx: i, name: c.name, call: c.call, x: cr.x - 6 + i * 3, y: cr.y - 4, state: 'idle', task: null, queue: [], injured: false, exposure: 0, backedOut: 0 }));
     },
     tick(S, dt) {
       for (const c of S.crew) {
@@ -56,7 +57,7 @@
             const t = c.queue.shift();
             if (L.plant.lelAt(S, t.x, t.y) < 20) start(S, c, t); else c.queue.unshift(t);
           } else if (!c.task && !c.stay && U.dist(c.x, c.y, D.POINTS.control.x, D.POINTS.control.y) > 8 && !S.muster.active) {
-            c.state = 'walk'; c.target = { x: D.POINTS.control.x + (c.id === 'FO1' ? -3 : 3), y: D.POINTS.control.y - 4 };
+            c.state = 'walk'; c.target = { x: D.POINTS.control.x - 6 + c.idx * 3, y: D.POINTS.control.y - 4 };
             c.task = { kind: 'return', label: 'Returning to control room', x: c.target.x, y: c.target.y, work: 0 };
           }
           if (c.task && c.task.kind === 'return' && c.state === 'idle') c.task = null;
@@ -128,7 +129,7 @@
       if (c.injured) continue;
       if (c.task && !['muster', 'return', 'retreat', 'firewatch'].includes(c.task.kind)) c.queue.unshift(c.task);
       c.task = { kind: 'muster', label: 'Muster point', x: D.POINTS.muster.x, y: D.POINTS.muster.y, work: 0 };
-      c.state = 'walk'; c.target = { x: D.POINTS.muster.x + (c.id === 'FO1' ? -2 : 2), y: D.POINTS.muster.y };
+      c.state = 'walk'; c.target = { x: D.POINTS.muster.x - 5 + c.idx * 2, y: D.POINTS.muster.y };
     }
   }
   function injure(S, c, why) {

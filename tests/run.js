@@ -25,6 +25,32 @@ for (const seed of [41, 42, 43]) check('random clicks do not crash — seed ' + 
   console.error = () => {}; // the monkey sends nonsense arguments on purpose; rejected actions are expected
   try { H.runShift({ seed, difficulty: 'senior', bot: H.monkeyBot }); } finally { console.error = err; }
 });
+// Crew autonomy: a player who never clicks anything.
+for (const preset of ['easy', 'tutorial']) {
+  check('autonomous crew run the shift with an idle player — ' + preset, () => {
+    const { S } = H.runShift({ seed: 9, config: preset, bot: H.idleBot });
+    if (S.outcome !== 'completed') throw new Error('ended: ' + S.endReason);
+    if (S.report.kpi.trucksOut < 5) throw new Error('only ' + S.report.kpi.trucksOut + ' trucks out');
+    if (S.report.safety < 70) throw new Error('safety ' + S.report.safety);
+    console.log('     ' + preset + ': grade ' + S.report.grade + ', ' + S.report.kpi.trucksOut + ' trucks, S' + Math.round(S.report.safety) + ' T' + Math.round(S.report.throughput) + ' C' + Math.round(S.report.compliance));
+  });
+}
+check('easy with approvals that wait: crew queue decisions for the player', () => {
+  const L = H.load();
+  const cfg = Object.assign({}, L.data.PRESETS.easy, { approvals: 'wait' });
+  const S = L.sim.create({ seed: 9, config: cfg, date: '2026-10-02' });
+  for (let i = 0; i < 600; i++) L.sim.tick(S, 20);
+  if (!S.approvals.length) throw new Error('no approval requests raised');
+  const before = S.approvals.length;
+  const r = L.sim.act(S, 'approvalAccept', S.approvals[0].id);
+  if (r.ok === false) throw new Error('approval failed: ' + r.msg);
+  console.log('     ' + before + ' requests pending, e.g. "' + S.log.filter((l) => l.cat === 'crew').slice(-1)[0].text + '"');
+});
+check('field autonomy: crew do field work but leave decisions', () => {
+  const { S } = H.runShift({ seed: 9, config: 'normal', bot: H.idleBot });
+  if (S.report.kpi.trucksOut > 0) throw new Error('trucks released without the player');
+  if (!S.tasks.find((t) => t.id === 'rounds1' && t.status !== 'missed')) throw new Error('crew did not do rounds');
+});
 check('physics: propane vapour pressure at 15 °C ≈ 7.3 bar abs', () => {
   const L = H.load();
   const p = L.phys.psatPure('propane', 15);
