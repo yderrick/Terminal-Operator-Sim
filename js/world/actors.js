@@ -283,7 +283,7 @@
       placeRing(hoverRing, world.hover && (!world.sel || world.hover.key !== world.sel.key) ? world.hover : null, t, false);
     };
 
-    const RING_SCALE = { truck: 4.6, car: 5.6, tank: 5.2, bay: 3.2, pump: 1.6, comp: 3, gd: 0.8, fd: 0.8, loco: 4.6 };
+    const RING_SCALE = { valve: 1.4, truck: 4.6, car: 5.6, tank: 5.2, bay: 3.2, pump: 1.6, comp: 3, gd: 0.8, fd: 0.8, loco: 4.6 };
     function placeRing(r, sel, t, pulse) {
       if (!sel) { r.visible = false; return; }
       const a = sel.key && A.actors.get(sel.key);
@@ -381,6 +381,12 @@
         led.emissive.setHex(c); led.color.setHex(c);
       }
       for (const f of S.fd) { const led = site.flames[f.id].userData.led.material; const c = f.fire && !f.inhibited ? 0xff2a1a : f.inhibited ? 0x3a6aff : 0x22ff55; led.emissive.setHex(c); led.color.setHex(c); }
+      // Valve positions
+      for (const id of S.tankOrder) {
+        const tk = S.tanks[id], v = site.valves[id];
+        const setV = (g, open) => { const m = g.userData.body; const c = open ? 0x2aa84a : 0xc2281f; if (m.color.getHex() !== c) { m.color.setHex(c); m.emissive.setHex(open ? 0x0f5a22 : 0x5a0f0f); } };
+        setV(v.in, L.plant.inletOpen(S, tk)); setV(v.out, L.plant.outletOpen(S, tk));
+      }
       // Labels
       for (const s of site.labels) s.visible = !!flags.labels;
       A.tagT -= dt;
@@ -434,12 +440,14 @@
       let li = 0;
       for (const f of S.fires) {
         const sz = f.out ? 0.2 : 0.4 + Math.sqrt(Math.max(f.size, 0.02)) * 2.2;
-        const n = 60 * sz * dt * 4;
+        const n = 22 * sz * dt * 4;
         for (let i = 0; i < n; i++) {
           const hot = Math.random();
-          fxA.emit(f.x + (Math.random() - 0.5) * sz, 1 + Math.random(), f.y + (Math.random() - 0.5) * sz, wx * 3 + (Math.random() - 0.5) * 3, 6 + Math.random() * 10 * sz, wz * 3 + (Math.random() - 0.5) * 3, 0.5 + Math.random() * 0.6, 1.8 + sz * 2.4, 1, 0.45 + hot * 0.45, 0.1 * hot, 0.75, -1.5, 0.6, 0);
+          // Jet flame: hot yellow core near the source, orange-red tongues further out.
+          const v = 5 + Math.random() * 9 * sz;
+          fxA.emit(f.x + (Math.random() - 0.5) * sz * 0.6, 1 + Math.random() * 0.6, f.y + (Math.random() - 0.5) * sz * 0.6, wx * 2.5 + (Math.random() - 0.5) * 2.5, v, wz * 2.5 + (Math.random() - 0.5) * 2.5, 0.35 + Math.random() * 0.5, 1.1 + sz * 1.3, 1, 0.22 + hot * 0.5, 0.02 + hot * 0.06, 0.26, -1.2, 0.5, 0);
         }
-        for (let i = 0; i < n * 0.25; i++) fx.emit(f.x + (Math.random() - 0.5) * sz, 6 + sz * 5, f.y, wx * 4, 3 + Math.random() * 2, wz * 4, 5, 3 + sz, 0.16, 0.15, 0.15, 0.45, 2.4, 0.1, -0.2);
+        for (let i = 0; i < n * 0.35; i++) fx.emit(f.x + (Math.random() - 0.5) * sz, 4 + sz * 4, f.y, wx * 4, 3 + Math.random() * 2, wz * 4, 6, 3 + sz * 1.5, 0.12, 0.11, 0.11, 0.55, 2.6, 0.1, -0.2);
         if (li < A.lights.length) { const l = A.lights[li++]; l.position.set(f.x, 4, f.y); l.intensity = (2.5 + Math.random()) * Math.min(1, sz); }
       }
       for (; li < A.lights.length; li++) A.lights[li].intensity = 0;
@@ -456,8 +464,33 @@
       if (L.plant.delugeEff(S, 'DV301') > 0) for (let i = 0; i < 70 * dt * 6; i++) fx.emit(184 + Math.random() * 58, 8.3, 60 + Math.random() * 36, 0, -2, 0, 1.2, 0.4, 0.72, 0.85, 0.98, 0.5, 0, 0, 9.8);
       if (L.plant.delugeEff(S, 'DV201') > 0) for (let i = 0; i < 40 * dt * 6; i++) fx.emit(44 + Math.random() * 70, 5, 68 + Math.random() * 14, 0, -2, 0, 0.8, 0.4, 0.72, 0.85, 0.98, 0.5, 0, 0, 9.8);
       if (L.plant.delugeEff(S, 'DV401') > 0) for (let i = 0; i < 40 * dt * 6; i++) fx.emit(30 + Math.random() * 70, 6, 132 + Math.random() * 12, 0, -2, 0, 1, 0.4, 0.72, 0.85, 0.98, 0.5, 0, 0, 9.8);
+      // Flow tracers along the pipework that is actually moving product
+      const H = S.headers;
+      if (H.propane.flow > 0.5) tracer(FLOW.propane.concat([[S.tanks[H.propane.source].x, 0.8, S.tanks[H.propane.source].y + 9]]), dt, 0.95, 0.75, 0.25);
+      if (H.butane.flow > 0.5) tracer(FLOW.butane, dt, 0.95, 0.85, 0.45);
+      for (const b of S.bays) if (b.flowing) tracer([[b.x + 4.2, 6.2, 70.5], [b.x + 4.2, 5.2, 74]], dt, 1, 0.8, 0.3, 4);
+      if (S.rail.comp.running && ((S.rail.flowKgS || 0) > 0.01 || (S.rail.vapKgS || 0) < -0.01)) { const car = S.rail.cars.find((c) => c.id === S.rail.comp.lineup); if (car) tracer(car.spotId === 'R1' ? FLOW.railR1 : FLOW.railR2, dt, 1, 0.82, 0.35); }
       // Diesel fire pump exhaust
       if (S.fw.diesel.running && Math.random() < dt * 10) fx.emit(site.fwExhaust.position.x, site.fwExhaust.position.y + 1, site.fwExhaust.position.z, 0.2, 2, 0.2, 3, 1.2, 0.2, 0.2, 0.22, 0.5, 1.6, 0.3, 0);
+    }
+
+    // Pipe routes for flow tracers (same coordinates as the site pipework)
+    const FLOW = {
+      propane: [[50, 1.6, 75], [50, 6.2, 75], [50, 6.2, 86], [178, 6.2, 86], [178, 6.2, 70.5], [242, 6.2, 70.5]],
+      butane: [[96, 1.6, 75], [96, 6.9, 75], [96, 6.9, 89], [176, 6.9, 89], [176, 6.9, 67.5], [242, 6.9, 67.5]],
+      railR1: [[46, 0.6, 133], [46, 0.6, 128], [66, 0.6, 128], [66, 0.6, 126]],
+      railR2: [[86, 0.6, 133], [86, 0.6, 128], [66, 0.6, 128], [66, 0.6, 126]],
+    };
+    function tracer(path, dt, r, g, b, rate) {
+      for (let i = 0; i < path.length - 1; i++) {
+        const a = path[i], c = path[i + 1];
+        const len = Math.hypot(c[0] - a[0], c[1] - a[1], c[2] - a[2]);
+        if (len < 0.5) continue;
+        const v = 14;
+        if (Math.random() < dt * (rate || 1) * Math.max(1, len / 12)) {
+          fxA.emit(a[0], a[1], a[2], (c[0] - a[0]) / len * v, (c[1] - a[1]) / len * v, (c[2] - a[2]) / len * v, len / v, 0.55, r, g, b, 0.9, 0, 0, 0);
+        }
+      }
     }
 
     // ---------------------------------------------------------------- Status icons

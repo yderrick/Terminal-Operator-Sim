@@ -13,6 +13,8 @@
   function setHTML(el, html) {
     if (!el) return;
     if (el._html === html) return;
+    // Never swap out the element under a pressed pointer: the click would be lost.
+    if (UI.pressed && el.contains(UI.pressed)) return;
     const a = document.activeElement;
     if (a && el.contains(a) && a !== el) {
       const tag = a.tagName;

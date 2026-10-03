@@ -394,6 +394,17 @@
     g.userData = { yaw, elbow, drop };
     return g;
   }
+  // Remotely operated shut-off valve: bow-tie body with an actuator; colour shows position.
+  function valve() {
+    const g = new T.Group();
+    const body = new T.MeshStandardMaterial({ color: 0x2aa84a, emissive: 0x0f5a22, emissiveIntensity: 0.5, flatShading: true });
+    for (const s of [-1, 1]) { const c = mesh(new T.ConeGeometry(0.42, 0.7, 10), body); c.rotation.z = s * Math.PI / 2; c.position.x = s * 0.35; g.add(c); }
+    g.add(cyl(0.08, 0.08, 0.7, mat(0x555555), 6, 0, 0.45, 0));
+    g.add(box(0.7, 0.45, 0.45, mat(0x3c6e8f), 0, 0.95, 0));
+    g.scale.setScalar(1.5);
+    g.userData.body = body;
+    return g;
+  }
   function building(w, h, d, wall, opts) {
     opts = opts || {};
     const g = new T.Group();
@@ -528,5 +539,5 @@
     return { points: pts, emit, update, material: matP };
   }
 
-  L.kit = { mergeGroup, T, PAL, mat, basic, mesh, box, cyl, sph, tube, pipeline, canvas, labelSprite, iconSprite, iconTexture, person, animatePerson, SUITS, PSCALE, truck, vanModel, fireEngine, excavator, railCar, loco, sphereTank, bullet, pump, loadingArm, building, detector, lightMast, windsock, tree, particleField, HAULIER_COLOURS, roundRect, FONT, MONO };
+  L.kit = { valve, mergeGroup, T, PAL, mat, basic, mesh, box, cyl, sph, tube, pipeline, canvas, labelSprite, iconSprite, iconTexture, person, animatePerson, SUITS, PSCALE, truck, vanModel, fireEngine, excavator, railCar, loco, sphereTank, bullet, pump, loadingArm, building, detector, lightMast, windsock, tree, particleField, HAULIER_COLOURS, roundRect, FONT, MONO };
 })(globalThis.LPG = globalThis.LPG || {});

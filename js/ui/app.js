@@ -66,19 +66,23 @@
 
   // ------------------------------------------------------------------ Rendering
   function renderTop() {
-    const W = S.weather;
+    const W2 = S.weather;
     const thr = L.sim.throughputScore(S);
-    const sc = (lbl, v, max) => '<div class="score' + (v < 60 ? ' bad' : v < 80 ? ' low' : '') + '"><label>' + lbl + '</label><span class="num">' + Math.round(v) + '</span><span></span><div class="bar"><i style="width:' + U.clamp(v / max * 100, 0, 100) + '%"></i></div></div>';
-    let h = '<div class="brand"><b>Harrowmere LPG</b><span>' + S.diff.label + ' · seed ' + S.seed + '</span></div>';
-    h += '<div class="clock"><span class="num">' + U.clockSec(S).slice(0, 5) + '</span><div class="shiftbar"><i style="width:' + (S.t / S.shiftLen * 100).toFixed(1) + '%"></i></div></div>';
-    h += '<div class="speed">' + '<button type="button" data-a="ui:pause" class="' + (UI.paused ? 'on' : '') + '" title="Pause (space)">❚❚</button>' + SPEEDS.map((s, i) => '<button type="button" data-a="ui:speed" data-p="[' + s + ']" class="' + (!UI.paused && UI.speed === s ? 'on' : '') + '" title="1 s = ' + s + ' s of shift time (key ' + (i + 1) + ')">' + s + '×</button>').join('') + '</div>';
-    h += '<div class="wx"><span><span class="num">' + W.Tamb.toFixed(1) + ' °C</span></span><span class="hide-s">wind <span class="num">' + W.wind.toFixed(1) + '</span> m/s ' + U.compass(W.windDir) + '</span>';
-    if (W.hold) h += '<span class="lt pill p2">Lightning stop to ' + U.clock(S, W.lastStrike10 + 1800) + '</span>';
-    else if (W.lightningKm < 30) h += '<span class="lt pill p3">Lightning ' + W.lightningKm.toFixed(0) + ' km</span>';
-    else h += '<span class="hide-s">' + (W.rain > 0.2 ? 'rain' : W.cloud > 0.6 ? 'overcast' : W.solar > 0.5 ? 'sunny' : 'fair') + '</span>';
-    h += '</div><div class="scores">' + sc('Safety', S.score.safety, 100) + sc('Throughput', thr, 100) + sc('Compliance', S.score.compliance, 100) + '</div>';
-    h += '<div class="topbtns">' + ubtn(UI.sound ? 'Sound on' : 'Sound off', 'sound', [], 'quiet sm') + ubtn('Theme', 'theme', [], 'quiet sm') + '<button type="button" class="esdbtn" data-a="ui:modal" data-p=\'["esd"]\'>ESD</button></div>';
-    setHTML($('top'), h);
+    const top = $('top');
+    if (!top.querySelector('#t-clock')) {
+      top.innerHTML = '<div class="brand"><b>Harrowmere LPG</b><span id="t-brand"></span></div><div class="clock" id="t-clock"></div><div class="speed" id="t-speed"></div><div class="wx" id="t-wx"></div><div class="scores" id="t-scores"></div><div class="topbtns" id="t-btns"></div>';
+    }
+    setHTML($('t-brand'), e(S.diff.label + ' · seed ' + S.seed));
+    setHTML($('t-clock'), '<span class="num">' + U.clockSec(S).slice(0, 5) + '</span><div class="shiftbar"><i style="width:' + (S.t / S.shiftLen * 100).toFixed(1) + '%"></i></div>');
+    setHTML($('t-speed'), '<button type="button" data-a="ui:pause" class="' + (UI.paused ? 'on' : '') + '" title="Pause (space)">❚❚</button>' + SPEEDS.map((sp, i) => '<button type="button" data-a="ui:speed" data-p="[' + sp + ']" class="' + (!UI.paused && UI.speed === sp ? 'on' : '') + '" title="1 s = ' + sp + ' s of shift time (key ' + (i + 1) + ')">' + sp + '×</button>').join(''));
+    let wx = '<span><span class="num">' + W2.Tamb.toFixed(1) + ' °C</span></span><span class="hide-s">wind <span class="num">' + W2.wind.toFixed(1) + '</span> m/s ' + U.compass(W2.windDir) + '</span>';
+    if (W2.hold) wx += '<span class="lt pill p2">Lightning stop to ' + U.clock(S, W2.lastStrike10 + 1800) + '</span>';
+    else if (W2.lightningKm < 30) wx += '<span class="lt pill p3">Lightning ' + W2.lightningKm.toFixed(0) + ' km</span>';
+    else wx += '<span class="hide-s">' + (W2.rain > 0.2 ? 'rain' : W2.cloud > 0.6 ? 'overcast' : W2.solar > 0.5 ? 'sunny' : 'fair') + '</span>';
+    setHTML($('t-wx'), wx);
+    const sc = (lbl, v) => '<div class="score' + (v < 60 ? ' bad' : v < 80 ? ' low' : '') + '"><label>' + lbl + '</label><span class="num">' + Math.round(v) + '</span><span></span><div class="bar"><i style="width:' + U.clamp(v, 0, 100) + '%"></i></div></div>';
+    setHTML($('t-scores'), sc('Safety', S.score.safety) + sc('Throughput', thr) + sc('Compliance', S.score.compliance));
+    setHTML($('t-btns'), ubtn(UI.sound ? '♪' : '♪̸', 'sound', [], 'quiet sm icon', { title: UI.sound ? 'Alarm horn on' : 'Alarm horn off' }) + ubtn('◐', 'theme', [], 'quiet sm icon', { title: 'Switch light / dark' }) + '<button type="button" class="esdbtn" data-a="ui:modal" data-p=\'["esd"]\'>ESD</button>');
   }
 
   function renderNav(att) {
@@ -241,12 +245,13 @@
     const fresh = S.toasts.filter((t) => t.id > UI.seenToast);
     if (fresh.length) {
       const box = $('toasts');
-      for (const t of fresh) {
+      for (const t of fresh.slice(-3)) {
         const d = document.createElement('div');
         d.className = 'toast ' + (t.kind === 'warn' ? 'warn' : '');
         d.textContent = t.text;
         box.appendChild(d);
         setTimeout(() => d.remove(), 3800);
+        while (box.children.length > 4) box.firstChild.remove();
       }
       UI.seenToast = fresh[fresh.length - 1].id;
     }
@@ -627,6 +632,10 @@
     document.addEventListener('input', onInput);
     document.addEventListener('change', onInput);
     document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', (ev) => { UI.pressed = ev.target; }, true);
+    const release = () => setTimeout(() => { UI.pressed = null; }, 0);
+    document.addEventListener('pointerup', release, true);
+    document.addEventListener('pointercancel', release, true);
     showStart();
     requestAnimationFrame(frame);
   }

@@ -296,7 +296,7 @@ svg.plant .esdmask { fill: var(--p1); opacity: .06; }
 
 /* ---------- Start & report screens ---------- */
 .start { position: fixed; inset: 0; z-index: 80; background: var(--bg); overflow-y: auto; padding: 32px 16px 48px; }
-.start-in { max-width: 980px; margin: 0 auto; display: grid; gap: 22px; }
+.start-in { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
 .start .hero { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; align-items: center; }
 .start .eyebrow { font-family: var(--f-data); font-size: 12px; color: var(--ink-3); letter-spacing: .1em; text-transform: uppercase; }
 .start h1 { font-size: clamp(34px, 6vw, 58px); line-height: .95; text-transform: uppercase; letter-spacing: .02em; }
@@ -340,7 +340,7 @@ svg.plant .esdmask { fill: var(--p1); opacity: .06; }
 .nav button.on { color: var(--ink); background: var(--panel-2); border-left-color: var(--accent); }
 .nav .badge, .needs .badge { font-family: var(--f-data); font-size: 11px; min-width: 18px; text-align: center; padding: 0 4px; border-radius: 9px; background: var(--ink-3); color: var(--panel); display: inline-block; }
 .nav .badge.p1, .needs .badge.p1 { background: var(--p1); color: #fff; } .nav .badge.p2, .needs .badge.p2 { background: var(--p2); color: #1d1d1d; }
-.needs { position: absolute; right: 10px; top: calc(var(--top-h) + 10px); z-index: 24; width: 320px; background: var(--glass); border: 1px solid var(--line); border-radius: 4px; backdrop-filter: blur(8px); box-shadow: 0 6px 20px rgba(0,0,0,.18); display: flex; flex-direction: column; max-height: calc(100% - var(--top-h) - var(--alarm-h) - 220px); min-height: 0; }
+.needs { position: absolute; right: 10px; top: calc(var(--top-h) + 10px); z-index: 24; width: 300px; background: var(--glass); border: 1px solid var(--line); border-radius: 4px; backdrop-filter: blur(8px); box-shadow: 0 6px 20px rgba(0,0,0,.18); display: flex; flex-direction: column; max-height: calc(100% - var(--top-h) - var(--alarm-h) - 310px); min-height: 0; }
 .needs-h { display: flex; gap: 2px; align-items: center; padding: 6px 6px 0; border-bottom: 1px solid var(--line); }
 .needs-tab { border: 0; background: none; cursor: pointer; padding: 6px 10px; font-family: var(--f-display); font-size: 15px; letter-spacing: .04em; color: var(--ink-2); border-bottom: 2px solid transparent; display: flex; gap: 6px; align-items: center; }
 .needs-tab.on { color: var(--ink); border-bottom-color: var(--accent); }
@@ -419,6 +419,10 @@ body.no-world .viewbar, body.no-world .minimap { display: none; }
   .gradebox { grid-template-columns: 1fr; }
   .ctx { left: 10px !important; right: 10px; max-width: none; }
 }
+
+.btn.icon { font-size: 15px; padding: 2px 8px; min-width: 30px; }
+.top { gap: 10px 14px; }
+@media (max-width: 1360px) { .speed button { padding: 3px 5px; } .score { min-width: 64px; } .wx .hide-s { display: none; } }
 
 </style>
 </head>
@@ -4952,6 +4956,17 @@ ${vpTable()}
     g.userData = { yaw, elbow, drop };
     return g;
   }
+  // Remotely operated shut-off valve: bow-tie body with an actuator; colour shows position.
+  function valve() {
+    const g = new T.Group();
+    const body = new T.MeshStandardMaterial({ color: 0x2aa84a, emissive: 0x0f5a22, emissiveIntensity: 0.5, flatShading: true });
+    for (const s of [-1, 1]) { const c = mesh(new T.ConeGeometry(0.42, 0.7, 10), body); c.rotation.z = s * Math.PI / 2; c.position.x = s * 0.35; g.add(c); }
+    g.add(cyl(0.08, 0.08, 0.7, mat(0x555555), 6, 0, 0.45, 0));
+    g.add(box(0.7, 0.45, 0.45, mat(0x3c6e8f), 0, 0.95, 0));
+    g.scale.setScalar(1.5);
+    g.userData.body = body;
+    return g;
+  }
   function building(w, h, d, wall, opts) {
     opts = opts || {};
     const g = new T.Group();
@@ -5086,7 +5101,7 @@ ${vpTable()}
     return { points: pts, emit, update, material: matP };
   }
 
-  L.kit = { mergeGroup, T, PAL, mat, basic, mesh, box, cyl, sph, tube, pipeline, canvas, labelSprite, iconSprite, iconTexture, person, animatePerson, SUITS, PSCALE, truck, vanModel, fireEngine, excavator, railCar, loco, sphereTank, bullet, pump, loadingArm, building, detector, lightMast, windsock, tree, particleField, HAULIER_COLOURS, roundRect, FONT, MONO };
+  L.kit = { valve, mergeGroup, T, PAL, mat, basic, mesh, box, cyl, sph, tube, pipeline, canvas, labelSprite, iconSprite, iconTexture, person, animatePerson, SUITS, PSCALE, truck, vanModel, fireEngine, excavator, railCar, loco, sphereTank, bullet, pump, loadingArm, building, detector, lightMast, windsock, tree, particleField, HAULIER_COLOURS, roundRect, FONT, MONO };
 })(globalThis.LPG = globalThis.LPG || {});
 
 // ---- js/world/site.js
@@ -5203,6 +5218,13 @@ ${vpTable()}
       const tag = K.labelSprite([{ t: t.tag, s: 50 }, { t: '', s: 34 }], { scale: 18, w: 768 });
       tag.position.set(t.x, cy + t.r + 6.5, t.y); root.add(tag); H.labels.push(tag);
       g.userData.tag = tag;
+    }
+    // ROSOVs on each sphere: inlet (A) and outlet (B)
+    H.valves = {};
+    for (const t of D.TANKS) {
+      const vin = K.valve(); vin.position.set(t.x + 4, 0.9, t.y + t.r + 1.6); root.add(vin); pickable(vin, 'valve', t.id + ':in', 'XV-' + t.id.slice(1) + 'A');
+      const vout = K.valve(); vout.position.set(t.x, 1.2, t.y + t.r + 4.5); vout.rotation.y = Math.PI / 2; root.add(vout); pickable(vout, 'valve', t.id + ':out', 'XV-' + t.id.slice(1) + 'B');
+      H.valves[t.id] = { in: vin, out: vout };
     }
     const bu = K.bullet(D.BULLET.len, D.BULLET.r); bu.position.set(D.BULLET.x, 0, D.BULLET.y); root.add(bu); pickable(bu, 'bullet', 'V104', 'V-104');
     label('V-104', D.BULLET.x, 9, D.BULLET.y, 'out of service', 9);
@@ -5822,7 +5844,7 @@ ${vpTable()}
       placeRing(hoverRing, world.hover && (!world.sel || world.hover.key !== world.sel.key) ? world.hover : null, t, false);
     };
 
-    const RING_SCALE = { truck: 4.6, car: 5.6, tank: 5.2, bay: 3.2, pump: 1.6, comp: 3, gd: 0.8, fd: 0.8, loco: 4.6 };
+    const RING_SCALE = { valve: 1.4, truck: 4.6, car: 5.6, tank: 5.2, bay: 3.2, pump: 1.6, comp: 3, gd: 0.8, fd: 0.8, loco: 4.6 };
     function placeRing(r, sel, t, pulse) {
       if (!sel) { r.visible = false; return; }
       const a = sel.key && A.actors.get(sel.key);
@@ -5920,6 +5942,12 @@ ${vpTable()}
         led.emissive.setHex(c); led.color.setHex(c);
       }
       for (const f of S.fd) { const led = site.flames[f.id].userData.led.material; const c = f.fire && !f.inhibited ? 0xff2a1a : f.inhibited ? 0x3a6aff : 0x22ff55; led.emissive.setHex(c); led.color.setHex(c); }
+      // Valve positions
+      for (const id of S.tankOrder) {
+        const tk = S.tanks[id], v = site.valves[id];
+        const setV = (g, open) => { const m = g.userData.body; const c = open ? 0x2aa84a : 0xc2281f; if (m.color.getHex() !== c) { m.color.setHex(c); m.emissive.setHex(open ? 0x0f5a22 : 0x5a0f0f); } };
+        setV(v.in, L.plant.inletOpen(S, tk)); setV(v.out, L.plant.outletOpen(S, tk));
+      }
       // Labels
       for (const s of site.labels) s.visible = !!flags.labels;
       A.tagT -= dt;
@@ -5973,12 +6001,14 @@ ${vpTable()}
       let li = 0;
       for (const f of S.fires) {
         const sz = f.out ? 0.2 : 0.4 + Math.sqrt(Math.max(f.size, 0.02)) * 2.2;
-        const n = 60 * sz * dt * 4;
+        const n = 22 * sz * dt * 4;
         for (let i = 0; i < n; i++) {
           const hot = Math.random();
-          fxA.emit(f.x + (Math.random() - 0.5) * sz, 1 + Math.random(), f.y + (Math.random() - 0.5) * sz, wx * 3 + (Math.random() - 0.5) * 3, 6 + Math.random() * 10 * sz, wz * 3 + (Math.random() - 0.5) * 3, 0.5 + Math.random() * 0.6, 1.8 + sz * 2.4, 1, 0.45 + hot * 0.45, 0.1 * hot, 0.75, -1.5, 0.6, 0);
+          // Jet flame: hot yellow core near the source, orange-red tongues further out.
+          const v = 5 + Math.random() * 9 * sz;
+          fxA.emit(f.x + (Math.random() - 0.5) * sz * 0.6, 1 + Math.random() * 0.6, f.y + (Math.random() - 0.5) * sz * 0.6, wx * 2.5 + (Math.random() - 0.5) * 2.5, v, wz * 2.5 + (Math.random() - 0.5) * 2.5, 0.35 + Math.random() * 0.5, 1.1 + sz * 1.3, 1, 0.22 + hot * 0.5, 0.02 + hot * 0.06, 0.26, -1.2, 0.5, 0);
         }
-        for (let i = 0; i < n * 0.25; i++) fx.emit(f.x + (Math.random() - 0.5) * sz, 6 + sz * 5, f.y, wx * 4, 3 + Math.random() * 2, wz * 4, 5, 3 + sz, 0.16, 0.15, 0.15, 0.45, 2.4, 0.1, -0.2);
+        for (let i = 0; i < n * 0.35; i++) fx.emit(f.x + (Math.random() - 0.5) * sz, 4 + sz * 4, f.y, wx * 4, 3 + Math.random() * 2, wz * 4, 6, 3 + sz * 1.5, 0.12, 0.11, 0.11, 0.55, 2.6, 0.1, -0.2);
         if (li < A.lights.length) { const l = A.lights[li++]; l.position.set(f.x, 4, f.y); l.intensity = (2.5 + Math.random()) * Math.min(1, sz); }
       }
       for (; li < A.lights.length; li++) A.lights[li].intensity = 0;
@@ -5995,8 +6025,33 @@ ${vpTable()}
       if (L.plant.delugeEff(S, 'DV301') > 0) for (let i = 0; i < 70 * dt * 6; i++) fx.emit(184 + Math.random() * 58, 8.3, 60 + Math.random() * 36, 0, -2, 0, 1.2, 0.4, 0.72, 0.85, 0.98, 0.5, 0, 0, 9.8);
       if (L.plant.delugeEff(S, 'DV201') > 0) for (let i = 0; i < 40 * dt * 6; i++) fx.emit(44 + Math.random() * 70, 5, 68 + Math.random() * 14, 0, -2, 0, 0.8, 0.4, 0.72, 0.85, 0.98, 0.5, 0, 0, 9.8);
       if (L.plant.delugeEff(S, 'DV401') > 0) for (let i = 0; i < 40 * dt * 6; i++) fx.emit(30 + Math.random() * 70, 6, 132 + Math.random() * 12, 0, -2, 0, 1, 0.4, 0.72, 0.85, 0.98, 0.5, 0, 0, 9.8);
+      // Flow tracers along the pipework that is actually moving product
+      const H = S.headers;
+      if (H.propane.flow > 0.5) tracer(FLOW.propane.concat([[S.tanks[H.propane.source].x, 0.8, S.tanks[H.propane.source].y + 9]]), dt, 0.95, 0.75, 0.25);
+      if (H.butane.flow > 0.5) tracer(FLOW.butane, dt, 0.95, 0.85, 0.45);
+      for (const b of S.bays) if (b.flowing) tracer([[b.x + 4.2, 6.2, 70.5], [b.x + 4.2, 5.2, 74]], dt, 1, 0.8, 0.3, 4);
+      if (S.rail.comp.running && ((S.rail.flowKgS || 0) > 0.01 || (S.rail.vapKgS || 0) < -0.01)) { const car = S.rail.cars.find((c) => c.id === S.rail.comp.lineup); if (car) tracer(car.spotId === 'R1' ? FLOW.railR1 : FLOW.railR2, dt, 1, 0.82, 0.35); }
       // Diesel fire pump exhaust
       if (S.fw.diesel.running && Math.random() < dt * 10) fx.emit(site.fwExhaust.position.x, site.fwExhaust.position.y + 1, site.fwExhaust.position.z, 0.2, 2, 0.2, 3, 1.2, 0.2, 0.2, 0.22, 0.5, 1.6, 0.3, 0);
+    }
+
+    // Pipe routes for flow tracers (same coordinates as the site pipework)
+    const FLOW = {
+      propane: [[50, 1.6, 75], [50, 6.2, 75], [50, 6.2, 86], [178, 6.2, 86], [178, 6.2, 70.5], [242, 6.2, 70.5]],
+      butane: [[96, 1.6, 75], [96, 6.9, 75], [96, 6.9, 89], [176, 6.9, 89], [176, 6.9, 67.5], [242, 6.9, 67.5]],
+      railR1: [[46, 0.6, 133], [46, 0.6, 128], [66, 0.6, 128], [66, 0.6, 126]],
+      railR2: [[86, 0.6, 133], [86, 0.6, 128], [66, 0.6, 128], [66, 0.6, 126]],
+    };
+    function tracer(path, dt, r, g, b, rate) {
+      for (let i = 0; i < path.length - 1; i++) {
+        const a = path[i], c = path[i + 1];
+        const len = Math.hypot(c[0] - a[0], c[1] - a[1], c[2] - a[2]);
+        if (len < 0.5) continue;
+        const v = 14;
+        if (Math.random() < dt * (rate || 1) * Math.max(1, len / 12)) {
+          fxA.emit(a[0], a[1], a[2], (c[0] - a[0]) / len * v, (c[1] - a[1]) / len * v, (c[2] - a[2]) / len * v, len / v, 0.55, r, g, b, 0.9, 0, 0, 0);
+        }
+      }
     }
 
     // ---------------------------------------------------------------- Status icons
@@ -6244,6 +6299,8 @@ ${vpTable()}
   function setHTML(el, html) {
     if (!el) return;
     if (el._html === html) return;
+    // Never swap out the element under a pressed pointer: the click would be lost.
+    if (UI.pressed && el.contains(UI.pressed)) return;
     const a = document.activeElement;
     if (a && el.contains(a) && a !== el) {
       const tag = a.tagName;
@@ -7144,6 +7201,7 @@ ${vpTable()}
       case 'shunter': case 'loco': title = 'Shunting locomotive'; sub = 'Network Rail freight'; lines.push('Placing or collecting tank cars'); break;
       case 'odor': title = 'Odorant delivery'; sub = 'Ethyl mercaptan, UN 2363'; lines.push(S.odorDelivery.inProgress ? 'Transferring under supervision' : 'Waiting for a field operator to supervise'); break;
       case 'tank': { const t = S.tanks[p.id]; title = t.tag; sub = t.product + ' sphere · ' + F.n0(t.Vtot) + ' m³'; lines.push('Level ' + F.pct(t.fillMeas) + ' (' + F.n0(t.levelMeas) + ' mm)'); lines.push('Pressure ' + t.P.toFixed(2) + ' barg · surface ' + t.Ts.toFixed(1) + ' °C'); lines.push('Inlet ' + (L.plant.inletOpen(S, t) ? 'open' : 'SHUT') + ' · outlet ' + (L.plant.outletOpen(S, t) ? 'open' : 'SHUT')); if (t.radar.flagged) lines.push('Radar flagged suspect'); break; }
+      case 'valve': { const [tid, w] = p.id.split(':'); const t = S.tanks[tid]; const open = w === 'in' ? L.plant.inletOpen(S, t) : L.plant.outletOpen(S, t); const cmd = w === 'in' ? t.xvIn : t.xvOut; title = 'XV-' + tid.slice(1) + (w === 'in' ? 'A' : 'B'); sub = t.tag + (w === 'in' ? ' inlet' : ' outlet') + ' ROSOV · fail-closed'; lines.push(open ? 'OPEN' : 'CLOSED' + (cmd && !open ? ' (held shut by ' + (t.lshhTrip && w === 'in' ? 'LSHH trip' : 'ESD / air') + ')' : '')); break; }
       case 'bullet': title = 'V-104'; sub = 'Bullet — out of service'; lines.push(D.BULLET.status); break;
       case 'pump': { const pu = S.pumps[p.id]; title = pu.tag; sub = pu.product + ' loading pump' + (pu.duty ? ' · duty' : ' · standby'); lines.push(pu.loto ? 'Locked out' : pu.tripped ? 'TRIPPED: ' + pu.tripCause : pu.running ? 'Running ' + pu.flow.toFixed(0) + ' m³/h · ' + pu.amps.toFixed(0) + ' A' : pu.isolated ? 'Isolated' : 'Stopped'); lines.push('Vibration ' + pu.vib.toFixed(1) + ' mm/s'); break; }
       case 'bay': { const b = S.bays.find((x) => x.id === p.id); title = b.tag; sub = b.product + (b.swing ? ' · swing bay' : ''); const tr = b.truckId && S.trucks.find((x) => x.id === b.truckId); lines.push(tr ? tr.plate + ' · ' + (L.views.bayPill ? b.state.toLowerCase() : '') : b.suspended ? 'Out of service' : 'Free'); if (b.state === 'LOADING') lines.push(F.n0(b.net) + ' / ' + F.n0(b.preset) + ' kg · ' + F.n0(b.flowLpm) + ' L/min'); break; }
@@ -7253,6 +7311,9 @@ ${vpTable()}
       h += btn(S.fw.deluge[dv.id].open ? 'Stop deluge' : 'Deluge', 'deluge', [dv.id, !S.fw.deluge[dv.id].open], 'sm ' + (S.fw.deluge[dv.id].open ? 'warn' : 'quiet'));
       if (S.headers[t.product].source !== t.id) h += btn('Line up header', 'setHeaderSource', [t.product, t.id], 'sm ghost');
       h += ubtn('Tank farm page', 'nav', ['tanks', t.id], 'sm ghost');
+    } else if (k === 'valve') {
+      const [tid, w] = sel.id.split(':'); const t = S.tanks[tid]; const cmd = w === 'in' ? t.xvIn : t.xvOut;
+      h += btn(cmd ? 'Close' : 'Open', 'setTankValve', [tid, w, !cmd], 'sm' + (cmd ? ' warn' : '')) + ubtn('Tank farm page', 'nav', ['tanks', tid], 'sm ghost');
     } else if (k === 'pump') {
       const p = S.pumps[sel.id];
       h += btn('Start', 'pumpStart', [p.id], 'sm', { disabled: p.running || p.loto }) + btn('Stop', 'pumpStop', [p.id], 'sm quiet', { disabled: !p.running });
@@ -7424,19 +7485,23 @@ ${vpTable()}
 
   // ------------------------------------------------------------------ Rendering
   function renderTop() {
-    const W = S.weather;
+    const W2 = S.weather;
     const thr = L.sim.throughputScore(S);
-    const sc = (lbl, v, max) => '<div class="score' + (v < 60 ? ' bad' : v < 80 ? ' low' : '') + '"><label>' + lbl + '</label><span class="num">' + Math.round(v) + '</span><span></span><div class="bar"><i style="width:' + U.clamp(v / max * 100, 0, 100) + '%"></i></div></div>';
-    let h = '<div class="brand"><b>Harrowmere LPG</b><span>' + S.diff.label + ' · seed ' + S.seed + '</span></div>';
-    h += '<div class="clock"><span class="num">' + U.clockSec(S).slice(0, 5) + '</span><div class="shiftbar"><i style="width:' + (S.t / S.shiftLen * 100).toFixed(1) + '%"></i></div></div>';
-    h += '<div class="speed">' + '<button type="button" data-a="ui:pause" class="' + (UI.paused ? 'on' : '') + '" title="Pause (space)">❚❚</button>' + SPEEDS.map((s, i) => '<button type="button" data-a="ui:speed" data-p="[' + s + ']" class="' + (!UI.paused && UI.speed === s ? 'on' : '') + '" title="1 s = ' + s + ' s of shift time (key ' + (i + 1) + ')">' + s + '×</button>').join('') + '</div>';
-    h += '<div class="wx"><span><span class="num">' + W.Tamb.toFixed(1) + ' °C</span></span><span class="hide-s">wind <span class="num">' + W.wind.toFixed(1) + '</span> m/s ' + U.compass(W.windDir) + '</span>';
-    if (W.hold) h += '<span class="lt pill p2">Lightning stop to ' + U.clock(S, W.lastStrike10 + 1800) + '</span>';
-    else if (W.lightningKm < 30) h += '<span class="lt pill p3">Lightning ' + W.lightningKm.toFixed(0) + ' km</span>';
-    else h += '<span class="hide-s">' + (W.rain > 0.2 ? 'rain' : W.cloud > 0.6 ? 'overcast' : W.solar > 0.5 ? 'sunny' : 'fair') + '</span>';
-    h += '</div><div class="scores">' + sc('Safety', S.score.safety, 100) + sc('Throughput', thr, 100) + sc('Compliance', S.score.compliance, 100) + '</div>';
-    h += '<div class="topbtns">' + ubtn(UI.sound ? 'Sound on' : 'Sound off', 'sound', [], 'quiet sm') + ubtn('Theme', 'theme', [], 'quiet sm') + '<button type="button" class="esdbtn" data-a="ui:modal" data-p=\'["esd"]\'>ESD</button></div>';
-    setHTML($('top'), h);
+    const top = $('top');
+    if (!top.querySelector('#t-clock')) {
+      top.innerHTML = '<div class="brand"><b>Harrowmere LPG</b><span id="t-brand"></span></div><div class="clock" id="t-clock"></div><div class="speed" id="t-speed"></div><div class="wx" id="t-wx"></div><div class="scores" id="t-scores"></div><div class="topbtns" id="t-btns"></div>';
+    }
+    setHTML($('t-brand'), e(S.diff.label + ' · seed ' + S.seed));
+    setHTML($('t-clock'), '<span class="num">' + U.clockSec(S).slice(0, 5) + '</span><div class="shiftbar"><i style="width:' + (S.t / S.shiftLen * 100).toFixed(1) + '%"></i></div>');
+    setHTML($('t-speed'), '<button type="button" data-a="ui:pause" class="' + (UI.paused ? 'on' : '') + '" title="Pause (space)">❚❚</button>' + SPEEDS.map((sp, i) => '<button type="button" data-a="ui:speed" data-p="[' + sp + ']" class="' + (!UI.paused && UI.speed === sp ? 'on' : '') + '" title="1 s = ' + sp + ' s of shift time (key ' + (i + 1) + ')">' + sp + '×</button>').join(''));
+    let wx = '<span><span class="num">' + W2.Tamb.toFixed(1) + ' °C</span></span><span class="hide-s">wind <span class="num">' + W2.wind.toFixed(1) + '</span> m/s ' + U.compass(W2.windDir) + '</span>';
+    if (W2.hold) wx += '<span class="lt pill p2">Lightning stop to ' + U.clock(S, W2.lastStrike10 + 1800) + '</span>';
+    else if (W2.lightningKm < 30) wx += '<span class="lt pill p3">Lightning ' + W2.lightningKm.toFixed(0) + ' km</span>';
+    else wx += '<span class="hide-s">' + (W2.rain > 0.2 ? 'rain' : W2.cloud > 0.6 ? 'overcast' : W2.solar > 0.5 ? 'sunny' : 'fair') + '</span>';
+    setHTML($('t-wx'), wx);
+    const sc = (lbl, v) => '<div class="score' + (v < 60 ? ' bad' : v < 80 ? ' low' : '') + '"><label>' + lbl + '</label><span class="num">' + Math.round(v) + '</span><span></span><div class="bar"><i style="width:' + U.clamp(v, 0, 100) + '%"></i></div></div>';
+    setHTML($('t-scores'), sc('Safety', S.score.safety) + sc('Throughput', thr) + sc('Compliance', S.score.compliance));
+    setHTML($('t-btns'), ubtn(UI.sound ? '♪' : '♪̸', 'sound', [], 'quiet sm icon', { title: UI.sound ? 'Alarm horn on' : 'Alarm horn off' }) + ubtn('◐', 'theme', [], 'quiet sm icon', { title: 'Switch light / dark' }) + '<button type="button" class="esdbtn" data-a="ui:modal" data-p=\'["esd"]\'>ESD</button>');
   }
 
   function renderNav(att) {
@@ -7599,12 +7664,13 @@ ${vpTable()}
     const fresh = S.toasts.filter((t) => t.id > UI.seenToast);
     if (fresh.length) {
       const box = $('toasts');
-      for (const t of fresh) {
+      for (const t of fresh.slice(-3)) {
         const d = document.createElement('div');
         d.className = 'toast ' + (t.kind === 'warn' ? 'warn' : '');
         d.textContent = t.text;
         box.appendChild(d);
         setTimeout(() => d.remove(), 3800);
+        while (box.children.length > 4) box.firstChild.remove();
       }
       UI.seenToast = fresh[fresh.length - 1].id;
     }
@@ -7985,6 +8051,10 @@ ${vpTable()}
     document.addEventListener('input', onInput);
     document.addEventListener('change', onInput);
     document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', (ev) => { UI.pressed = ev.target; }, true);
+    const release = () => setTimeout(() => { UI.pressed = null; }, 0);
+    document.addEventListener('pointerup', release, true);
+    document.addEventListener('pointercancel', release, true);
     showStart();
     requestAnimationFrame(frame);
   }

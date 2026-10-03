@@ -51,6 +51,7 @@
       case 'shunter': case 'loco': title = 'Shunting locomotive'; sub = 'Network Rail freight'; lines.push('Placing or collecting tank cars'); break;
       case 'odor': title = 'Odorant delivery'; sub = 'Ethyl mercaptan, UN 2363'; lines.push(S.odorDelivery.inProgress ? 'Transferring under supervision' : 'Waiting for a field operator to supervise'); break;
       case 'tank': { const t = S.tanks[p.id]; title = t.tag; sub = t.product + ' sphere · ' + F.n0(t.Vtot) + ' m³'; lines.push('Level ' + F.pct(t.fillMeas) + ' (' + F.n0(t.levelMeas) + ' mm)'); lines.push('Pressure ' + t.P.toFixed(2) + ' barg · surface ' + t.Ts.toFixed(1) + ' °C'); lines.push('Inlet ' + (L.plant.inletOpen(S, t) ? 'open' : 'SHUT') + ' · outlet ' + (L.plant.outletOpen(S, t) ? 'open' : 'SHUT')); if (t.radar.flagged) lines.push('Radar flagged suspect'); break; }
+      case 'valve': { const [tid, w] = p.id.split(':'); const t = S.tanks[tid]; const open = w === 'in' ? L.plant.inletOpen(S, t) : L.plant.outletOpen(S, t); const cmd = w === 'in' ? t.xvIn : t.xvOut; title = 'XV-' + tid.slice(1) + (w === 'in' ? 'A' : 'B'); sub = t.tag + (w === 'in' ? ' inlet' : ' outlet') + ' ROSOV · fail-closed'; lines.push(open ? 'OPEN' : 'CLOSED' + (cmd && !open ? ' (held shut by ' + (t.lshhTrip && w === 'in' ? 'LSHH trip' : 'ESD / air') + ')' : '')); break; }
       case 'bullet': title = 'V-104'; sub = 'Bullet — out of service'; lines.push(D.BULLET.status); break;
       case 'pump': { const pu = S.pumps[p.id]; title = pu.tag; sub = pu.product + ' loading pump' + (pu.duty ? ' · duty' : ' · standby'); lines.push(pu.loto ? 'Locked out' : pu.tripped ? 'TRIPPED: ' + pu.tripCause : pu.running ? 'Running ' + pu.flow.toFixed(0) + ' m³/h · ' + pu.amps.toFixed(0) + ' A' : pu.isolated ? 'Isolated' : 'Stopped'); lines.push('Vibration ' + pu.vib.toFixed(1) + ' mm/s'); break; }
       case 'bay': { const b = S.bays.find((x) => x.id === p.id); title = b.tag; sub = b.product + (b.swing ? ' · swing bay' : ''); const tr = b.truckId && S.trucks.find((x) => x.id === b.truckId); lines.push(tr ? tr.plate + ' · ' + (L.views.bayPill ? b.state.toLowerCase() : '') : b.suspended ? 'Out of service' : 'Free'); if (b.state === 'LOADING') lines.push(F.n0(b.net) + ' / ' + F.n0(b.preset) + ' kg · ' + F.n0(b.flowLpm) + ' L/min'); break; }
@@ -160,6 +161,9 @@
       h += btn(S.fw.deluge[dv.id].open ? 'Stop deluge' : 'Deluge', 'deluge', [dv.id, !S.fw.deluge[dv.id].open], 'sm ' + (S.fw.deluge[dv.id].open ? 'warn' : 'quiet'));
       if (S.headers[t.product].source !== t.id) h += btn('Line up header', 'setHeaderSource', [t.product, t.id], 'sm ghost');
       h += ubtn('Tank farm page', 'nav', ['tanks', t.id], 'sm ghost');
+    } else if (k === 'valve') {
+      const [tid, w] = sel.id.split(':'); const t = S.tanks[tid]; const cmd = w === 'in' ? t.xvIn : t.xvOut;
+      h += btn(cmd ? 'Close' : 'Open', 'setTankValve', [tid, w, !cmd], 'sm' + (cmd ? ' warn' : '')) + ubtn('Tank farm page', 'nav', ['tanks', tid], 'sm ghost');
     } else if (k === 'pump') {
       const p = S.pumps[sel.id];
       h += btn('Start', 'pumpStart', [p.id], 'sm', { disabled: p.running || p.loto }) + btn('Stop', 'pumpStop', [p.id], 'sm quiet', { disabled: !p.running });

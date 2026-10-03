@@ -112,6 +112,13 @@
       tag.position.set(t.x, cy + t.r + 6.5, t.y); root.add(tag); H.labels.push(tag);
       g.userData.tag = tag;
     }
+    // ROSOVs on each sphere: inlet (A) and outlet (B)
+    H.valves = {};
+    for (const t of D.TANKS) {
+      const vin = K.valve(); vin.position.set(t.x + 4, 0.9, t.y + t.r + 1.6); root.add(vin); pickable(vin, 'valve', t.id + ':in', 'XV-' + t.id.slice(1) + 'A');
+      const vout = K.valve(); vout.position.set(t.x, 1.2, t.y + t.r + 4.5); vout.rotation.y = Math.PI / 2; root.add(vout); pickable(vout, 'valve', t.id + ':out', 'XV-' + t.id.slice(1) + 'B');
+      H.valves[t.id] = { in: vin, out: vout };
+    }
     const bu = K.bullet(D.BULLET.len, D.BULLET.r); bu.position.set(D.BULLET.x, 0, D.BULLET.y); root.add(bu); pickable(bu, 'bullet', 'V104', 'V-104');
     label('V-104', D.BULLET.x, 9, D.BULLET.y, 'out of service', 9);
 
